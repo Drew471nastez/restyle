@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { PublicFooter } from '@/components/layout/PublicFooter';
 import CountrySelector from '@/components/CountrySelector';
+import { ToastProvider } from '@/components/ui/Toast';
 
 export default async function LocaleLayout({
   children,
@@ -13,10 +14,12 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <CountrySelector />
-      <PublicHeader />
-      <main className="flex-1">{children}</main>
-      <PublicFooter />
+      <ToastProvider>
+        <CountrySelector />
+        <PublicHeader />
+        <main className="flex-1">{children}</main>
+        <PublicFooter />
+      </ToastProvider>
     </NextIntlClientProvider>
   );
 }
