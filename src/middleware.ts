@@ -11,6 +11,7 @@ const PROTECTED_PATHS = [
 ];
 
 function isProtectedPath(pathname: string): boolean {
+  // Strip locale prefix if present
   const pathWithoutLocale = pathname.replace(/^\/(en|ro)/, '') || '/';
   return PROTECTED_PATHS.some(p => pathWithoutLocale.startsWith(p));
 }
@@ -49,8 +50,10 @@ export default async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      const locale = pathname.startsWith('/ro') ? 'ro' : 'en';
-      const loginUrl = new URL(`/${locale}/login`, request.url);
+      // For as-needed mode: only add locale prefix for non-default locale
+      const isRomanian = pathname.startsWith('/ro');
+      const loginPath = isRomanian ? '/ro/login' : '/login';
+      const loginUrl = new URL(loginPath, request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }

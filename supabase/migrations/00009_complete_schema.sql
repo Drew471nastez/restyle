@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   stripe_onboarding_complete BOOLEAN DEFAULT false,
   rating_avg DECIMAL(3,2) DEFAULT 0,
   rating_count INTEGER DEFAULT 0,
+  last_active_at TIMESTAMPTZ DEFAULT now(),
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

@@ -368,7 +368,18 @@
     "notificationsDescription": "Configureaz\u0103 preferin\u021bele de notificare",
     "security": "Securitate",
     "securityDescription": "Schimb\u0103 parola \u0219i set\u0103rile de securitate",
-    "logout": "Deconectare"
+    "logout": "Deconectare",
+    "activeToday": "Activ ast\u0103zi",
+    "lastActive": "Activ acum {time}",
+    "selling": "De v\u00e2nzare",
+    "likes": "Aprecieri",
+    "saves": "Salvate",
+    "sold": "V\u00e2ndut",
+    "cancel": "Anuleaz\u0103",
+    "listAnItem": "Listeaz\u0103 un articol",
+    "startSellingCTA": "\u00cencepe s\u0103 vinzi ast\u0103zi",
+    "startSellingDescription": "Transform\u0103-\u021bi hainele \u00een bani. Listeaz\u0103 un articol \u0219i \u00eencepe s\u0103 c\u00e2\u0219tigi.",
+    "noLikes": "Niciun articol apreciat \u00eenc\u0103"
   },
   "seller": {
     "startSelling": "\u00cencepe s\u0103 vinzi",

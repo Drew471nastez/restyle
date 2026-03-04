@@ -368,7 +368,18 @@
     "notificationsDescription": "Configure your notification preferences",
     "security": "Security",
     "securityDescription": "Change your password and security settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "activeToday": "Active today",
+    "lastActive": "Active {time} ago",
+    "selling": "Selling",
+    "likes": "Likes",
+    "saves": "Saves",
+    "sold": "Sold",
+    "cancel": "Cancel",
+    "listAnItem": "List an item",
+    "startSellingCTA": "Start selling today",
+    "startSellingDescription": "Turn your clothes into cash. List an item and start earning.",
+    "noLikes": "No liked items yet"
   },
   "seller": {
     "startSelling": "Start selling",

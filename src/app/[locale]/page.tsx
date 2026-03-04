@@ -32,43 +32,71 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-emerald-50">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:py-24">
-          <div className="text-center max-w-2xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">
+      <section className="relative overflow-hidden bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:py-16">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">
               {t('common.tagline')}
             </h1>
-            <p className="mt-4 text-lg text-gray-500 leading-relaxed">
+            <p className="mt-3 text-base text-gray-500 leading-relaxed">
               Buy and sell pre-loved fashion. Join thousands who choose sustainable style.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/browse"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-teal-500 text-white rounded-full text-base font-medium hover:bg-teal-600 transition shadow-lg shadow-teal-500/20"
+                className="inline-flex items-center justify-center gap-2 h-11 px-7 bg-teal-500 text-white rounded-full text-sm font-medium hover:bg-teal-600 transition shadow-lg shadow-teal-500/20"
               >
                 {t('nav.browse')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-white text-gray-700 rounded-full text-base font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition"
+                className="inline-flex items-center justify-center gap-2 h-11 px-7 bg-white text-gray-700 rounded-full text-sm font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition"
               >
                 {t('common.sell')}
               </Link>
             </div>
           </div>
+
+          {/* Large Category Cards - Depop style */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto">
+            <Link
+              href="/browse?category=women"
+              className="relative aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-300 via-pink-200 to-orange-200" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                <p className="text-white text-xl sm:text-2xl font-bold">{t('categories.women')}</p>
+                <p className="text-white/80 text-xs sm:text-sm mt-0.5">Dresses, tops, shoes & more</p>
+              </div>
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+            </Link>
+            <Link
+              href="/browse?category=men"
+              className="relative aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-400 via-blue-300 to-cyan-200" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                <p className="text-white text-xl sm:text-2xl font-bold">{t('categories.men')}</p>
+                <p className="text-white/80 text-xs sm:text-sm mt-0.5">Jackets, sneakers, tees & more</p>
+              </div>
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Category Chips */}
-      <section className="py-6 border-b border-gray-100">
+      <section className="py-5 border-b border-gray-100 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+          <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/browse?category=${cat.slug}`}
-                className="shrink-0 flex items-center gap-2 h-10 px-5 bg-gray-50 rounded-full text-sm font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700 border border-gray-200 hover:border-teal-200 transition"
+                className="shrink-0 flex items-center gap-2 h-10 px-5 bg-white rounded-full text-sm font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700 border border-gray-200 hover:border-teal-200 transition"
               >
                 <span>{cat.emoji}</span>
                 {cat.label}
@@ -79,15 +107,15 @@ export default async function HomePage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="py-10 bg-white">
+      <section className="py-8 bg-white">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { icon: Shield, title: 'Buyer Protection', desc: 'Your money is safe until you confirm delivery' },
               { icon: Truck, title: 'Easy Shipping', desc: 'Pre-paid labels and locker delivery options' },
               { icon: Banknote, title: 'Fast Payouts', desc: 'Get paid directly to your bank account' },
             ].map((item) => (
-              <div key={item.title} className="flex items-start gap-4 p-4">
+              <div key={item.title} className="flex items-start gap-3 p-4">
                 <div className="shrink-0 w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
                   <item.icon className="h-5 w-5 text-teal-600" />
                 </div>
