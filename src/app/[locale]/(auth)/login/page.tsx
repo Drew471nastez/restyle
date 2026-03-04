@@ -10,7 +10,7 @@ import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
 export default function LoginPage() {
   const t = useTranslations('auth');
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/app';
+  const redirect = searchParams.get('redirect') || '/';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,7 +65,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left branding panel - desktop only */}
-      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-400 items-center justify-center overflow-hidden">
+      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-violet-600 via-violet-500 to-purple-400 items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-20 left-10 w-40 h-40 bg-white/10 rounded-full blur-xl" />
           <div className="absolute bottom-20 right-10 w-60 h-60 bg-white/10 rounded-full blur-xl" />
@@ -76,14 +76,14 @@ export default function LoginPage() {
             <span className="text-white font-bold text-2xl">R</span>
           </div>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">Welcome back to ReStyle</h2>
-          <p className="text-teal-100 text-base leading-relaxed">
+          <p className="text-violet-100 text-base leading-relaxed">
             Your pre-loved fashion marketplace. Sustainable style, great prices.
           </p>
           <div className="mt-10 grid grid-cols-3 gap-4 text-center">
             {[['1M+', 'Members'], ['500K+', 'Listings'], ['4.8★', 'Rating']].map(([val, label]) => (
               <div key={label}>
                 <p className="text-2xl font-bold text-white">{val}</p>
-                <p className="text-xs text-teal-200 mt-0.5">{label}</p>
+                <p className="text-xs text-violet-200 mt-0.5">{label}</p>
               </div>
             ))}
           </div>
@@ -96,7 +96,7 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="text-center mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-9 h-9 bg-teal-500 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-violet-500 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-base">R</span>
               </div>
               <span className="text-xl font-bold text-gray-900">ReStyle</span>
@@ -111,10 +111,10 @@ export default function LoginPage() {
           {/* Success state */}
           {success && (
             <div className="mb-6 flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-              <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+              <CheckCircle2 className="h-5 w-5 text-purple-500 shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-emerald-800">Login successful!</p>
-                <p className="text-xs text-emerald-600">Redirecting you now…</p>
+                <p className="text-xs text-purple-600">Redirecting you now…</p>
               </div>
             </div>
           )}
@@ -166,7 +166,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 outline-none transition-all"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 outline-none transition-all"
                 placeholder="you@example.com"
               />
             </div>
@@ -176,7 +176,7 @@ export default function LoginPage() {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   {t('password')}
                 </label>
-                <Link href="/forgot-password" className="text-xs text-teal-500 hover:text-teal-600 transition-colors">
+                <Link href="/forgot-password" className="text-xs text-violet-500 hover:text-violet-600 transition-colors">
                   {t('forgotPassword')}
                 </Link>
               </div>
@@ -188,7 +188,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 outline-none transition-all"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 outline-none transition-all"
                   placeholder="••••••••"
                 />
                 <button
@@ -204,7 +204,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full rounded-xl bg-teal-500 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="w-full rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {loading ? 'Signing in…' : success ? 'Redirecting…' : t('login')}
@@ -214,7 +214,7 @@ export default function LoginPage() {
           {/* Sign up link */}
           <p className="mt-6 text-center text-sm text-gray-500">
             {t('noAccount')}{' '}
-            <Link href="/signup" className="font-semibold text-teal-500 hover:text-teal-600 transition-colors">
+            <Link href="/signup" className="font-semibold text-violet-500 hover:text-violet-600 transition-colors">
               {t('signUp')}
             </Link>
           </p>

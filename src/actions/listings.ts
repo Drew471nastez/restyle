@@ -8,6 +8,22 @@ export async function createListing(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized' };
 
+  // Ensure profile exists (needed for seller_id FK)
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .single();
+
+  if (!existingProfile) {
+    const username = user.user_metadata?.username || user.email?.split('@')[0] || 'user';
+    await supabase.from('profiles').insert({
+      id: user.id,
+      username,
+      display_name: username,
+    });
+  }
+
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
   const brand = formData.get('brand') as string;

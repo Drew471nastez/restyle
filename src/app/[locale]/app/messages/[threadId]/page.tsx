@@ -214,7 +214,7 @@ export default function ChatThreadPage({
   if (isLoading) {
     return (
       <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
       </div>
     );
   }
@@ -274,7 +274,7 @@ export default function ChatThreadPage({
               <p className="truncate text-sm font-medium text-gray-900">
                 {listing.title}
               </p>
-              <p className="text-sm font-bold text-teal-600">
+              <p className="text-sm font-bold text-violet-600">
                 {(listing.price / 100).toFixed(2)} RON
               </p>
             </div>
@@ -311,7 +311,7 @@ export default function ChatThreadPage({
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                         isSent
-                          ? 'rounded-br-md bg-teal-500 text-white'
+                          ? 'rounded-br-md bg-violet-500 text-white'
                           : 'rounded-bl-md bg-white text-gray-900 shadow-sm'
                       }`}
                     >
@@ -320,7 +320,7 @@ export default function ChatThreadPage({
                       </p>
                       <p
                         className={`mt-1 text-right text-[10px] ${
-                          isSent ? 'text-teal-100' : 'text-gray-400'
+                          isSent ? 'text-violet-100' : 'text-gray-400'
                         }`}
                       >
                         {formatTime(msg.created_at)}
@@ -346,12 +346,12 @@ export default function ChatThreadPage({
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder={t('typePlaceholder')}
-          className="flex-1 rounded-full border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="flex-1 rounded-full border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
         />
         <button
           type="submit"
           disabled={!newMessage.trim() || isSending}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-500 text-white transition-colors hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-500 text-white transition-colors hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Send className="h-4 w-4" />
         </button>

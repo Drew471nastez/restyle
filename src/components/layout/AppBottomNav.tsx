@@ -25,7 +25,7 @@ export function AppBottomNav() {
           if (item.isAction) {
             return (
               <Link key={item.href} href={item.href} className="flex flex-col items-center -mt-3">
-                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-teal-500 text-white shadow-lg shadow-teal-500/30">
+                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-violet-500 text-white shadow-lg shadow-violet-500/30">
                   <Icon className="h-6 w-6" />
                 </div>
               </Link>
@@ -38,7 +38,7 @@ export function AppBottomNav() {
               href={item.href}
               className={cn(
                 'flex flex-col items-center justify-center gap-0.5 py-1 px-3',
-                isActive ? 'text-teal-600' : 'text-gray-400'
+                isActive ? 'text-violet-600' : 'text-gray-400'
               )}
             >
               <Icon className="h-5 w-5" />

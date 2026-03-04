@@ -76,7 +76,7 @@ export default async function FavoritesPage() {
           </p>
           <Link
             href="/browse"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-600"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
           >
             <ShoppingBag className="h-4 w-4" />
             {t('browseCTA')}
@@ -118,7 +118,7 @@ export default async function FavoritesPage() {
               </div>
 
               <div className="p-3">
-                <p className="text-sm font-bold text-teal-600">
+                <p className="text-sm font-bold text-violet-600">
                   {(listing.price / 100).toFixed(2)} RON
                 </p>
                 <h3 className="mt-0.5 truncate text-sm text-gray-900">

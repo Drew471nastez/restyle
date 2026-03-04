@@ -58,7 +58,7 @@ export default async function ListingsPage() {
         </div>
         <Link
           href="/app/sell"
-          className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-600"
+          className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
         >
           <Plus className="h-4 w-4" />
           {t('newListing')}
@@ -78,7 +78,7 @@ export default async function ListingsPage() {
           </p>
           <Link
             href="/app/sell"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-600"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
           >
             <Plus className="h-4 w-4" />
             {t('createFirst')}
@@ -119,7 +119,7 @@ export default async function ListingsPage() {
                 <p className="mt-0.5 text-xs capitalize text-gray-500">
                   {listing.category}
                 </p>
-                <p className="mt-2 text-lg font-bold text-teal-600">
+                <p className="mt-2 text-lg font-bold text-violet-600">
                   {(listing.price / 100).toFixed(2)} RON
                 </p>
                 <p className="mt-1 text-xs text-gray-400">

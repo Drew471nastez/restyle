@@ -68,7 +68,7 @@ export default function SellPage() {
         return;
       }
 
-      router.push('/app/listings');
+      router.push('/');
     } catch {
       setError(t('unexpectedError'));
       setIsSubmitting(false);
@@ -116,7 +116,7 @@ export default function SellPage() {
                   <X className="h-3 w-3" />
                 </button>
                 {index === 0 && (
-                  <span className="absolute bottom-1 left-1 rounded bg-teal-500 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                  <span className="absolute bottom-1 left-1 rounded bg-violet-500 px-1.5 py-0.5 text-[10px] font-medium text-white">
                     {t('cover')}
                   </span>
                 )}
@@ -126,7 +126,7 @@ export default function SellPage() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-24 w-24 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-teal-400 hover:text-teal-500 sm:h-28 sm:w-28"
+                className="flex h-24 w-24 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-violet-400 hover:text-violet-500 sm:h-28 sm:w-28"
               >
                 <ImagePlus className="h-6 w-6" />
                 <span className="mt-1 text-[10px]">{t('addPhoto')}</span>
@@ -162,7 +162,7 @@ export default function SellPage() {
                 type="text"
                 required
                 placeholder={t('titlePlaceholder')}
-                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
             </div>
 
@@ -179,7 +179,7 @@ export default function SellPage() {
                 rows={4}
                 required
                 placeholder={t('descriptionPlaceholder')}
-                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
             </div>
 
@@ -195,7 +195,7 @@ export default function SellPage() {
                 name="brand"
                 type="text"
                 placeholder={t('brandPlaceholder')}
-                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function SellPage() {
                     setSubcategory('');
                   }}
                   required
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
                 >
                   <option value="">{t('selectCategory')}</option>
                   {CATEGORIES.map((cat) => (
@@ -246,7 +246,7 @@ export default function SellPage() {
                   value={subcategory}
                   onChange={(e) => setSubcategory(e.target.value)}
                   disabled={!selectedCategory}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
                 >
                   <option value="">{t('selectSubcategory')}</option>
                   {selectedCategory?.subcategories.map((sub) => (
@@ -270,7 +270,7 @@ export default function SellPage() {
                   id="condition"
                   name="condition"
                   required
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
                 >
                   <option value="">{t('selectCondition')}</option>
                   {CONDITIONS.map((cond) => (
@@ -292,7 +292,7 @@ export default function SellPage() {
                       e.target.value as 'clothing' | 'shoes_eu' | 'numeric'
                     )
                   }
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
                 >
                   <option value="clothing">{t('clothingSizes')}</option>
                   <option value="shoes_eu">{t('shoeSizes')}</option>
@@ -312,7 +312,7 @@ export default function SellPage() {
                 id="size"
                 name="size"
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               >
                 <option value="">{t('selectSize')}</option>
                 {SIZES[sizeType].map((size) => (
@@ -349,7 +349,7 @@ export default function SellPage() {
                 min="1"
                 required
                 placeholder="0.00"
-                className="w-full rounded-lg border border-gray-300 py-2.5 pl-14 pr-3.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full rounded-lg border border-gray-300 py-2.5 pl-14 pr-3.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
             </div>
             <p className="mt-1.5 text-xs text-gray-500">{t('priceHint')}</p>
@@ -368,7 +368,7 @@ export default function SellPage() {
           <button
             type="submit"
             disabled={isSubmitting || images.length === 0}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-teal-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-8"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-8"
           >
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             {isSubmitting ? t('publishing') : t('publish')}

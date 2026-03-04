@@ -92,7 +92,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   type="text"
                   defaultValue={filters.q || ''}
                   placeholder={t('searchPlaceholder')}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                 />
               </div>
 
@@ -104,7 +104,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 <select
                   name="category"
                   defaultValue={filters.category || ''}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                 >
                   <option value="">{t('allCategories')}</option>
                   {CATEGORIES.map((cat) => (
@@ -128,7 +128,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   {SIZES.clothing.map((size) => (
                     <label
                       key={size}
-                      className="flex items-center justify-center rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-600 cursor-pointer hover:border-teal-500 hover:text-teal-600 has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 has-[:checked]:text-teal-600 transition-colors"
+                      className="flex items-center justify-center rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-600 cursor-pointer hover:border-violet-500 hover:text-violet-600 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 has-[:checked]:text-violet-600 transition-colors"
                     >
                       <input type="checkbox" name="size" value={size} defaultChecked={filters.size?.includes(size)} className="sr-only" />
                       {size}
@@ -145,7 +145,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 <div className="space-y-1.5">
                   {CONDITIONS.map((cond) => (
                     <label key={cond.value} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                      <input type="checkbox" name="condition" value={cond.value} defaultChecked={filters.condition?.includes(cond.value)} className="rounded border-gray-300 text-teal-500 focus:ring-teal-500" />
+                      <input type="checkbox" name="condition" value={cond.value} defaultChecked={filters.condition?.includes(cond.value)} className="rounded border-gray-300 text-violet-500 focus:ring-violet-500" />
                       {cond.label}
                     </label>
                   ))}
@@ -158,9 +158,9 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   {t('priceRange')}
                 </label>
                 <div className="flex items-center gap-2">
-                  <input name="price_min" type="number" min={0} defaultValue={filters.price_min || ''} placeholder={t('min')} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none" />
+                  <input name="price_min" type="number" min={0} defaultValue={filters.price_min || ''} placeholder={t('min')} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none" />
                   <span className="text-gray-400 text-sm">–</span>
-                  <input name="price_max" type="number" min={0} defaultValue={filters.price_max || ''} placeholder={t('max')} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none" />
+                  <input name="price_max" type="number" min={0} defaultValue={filters.price_max || ''} placeholder={t('max')} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none" />
                 </div>
               </div>
 
@@ -169,7 +169,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   {t('sortBy')}
                 </label>
-                <select name="sort" defaultValue={filters.sort || 'newest'} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white">
+                <select name="sort" defaultValue={filters.sort || 'newest'} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white">
                   <option value="newest">{t('sortNewest')}</option>
                   <option value="price_asc">{t('sortPriceAsc')}</option>
                   <option value="price_desc">{t('sortPriceDesc')}</option>
@@ -177,7 +177,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 </select>
               </div>
 
-              <button type="submit" className="w-full rounded-lg bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-600 transition-colors">
+              <button type="submit" className="w-full rounded-lg bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-600 transition-colors">
                 {t('applyFilters')}
               </button>
             </form>
@@ -215,7 +215,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                         </div>
                       )}
                       {listing.profiles?.is_pro && (
-                        <span className="absolute top-2 left-2 bg-teal-500 text-white text-[10px] font-bold uppercase px-1.5 py-0.5 rounded">
+                        <span className="absolute top-2 left-2 bg-violet-500 text-white text-[10px] font-bold uppercase px-1.5 py-0.5 rounded">
                           PRO
                         </span>
                       )}
@@ -277,7 +277,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                       href={`/browse?${new URLSearchParams({ ...params as Record<string, string>, page: String(pageNum) }).toString()}`}
                       className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                         pageNum === currentPage
-                          ? 'bg-teal-500 text-white'
+                          ? 'bg-violet-500 text-white'
                           : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                       }`}
                     >

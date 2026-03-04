@@ -104,7 +104,7 @@ export default async function DashboardPage() {
       label: t('activeListings'),
       value: activeListings,
       icon: ShoppingBag,
-      color: 'bg-teal-100 text-teal-600',
+      color: 'bg-violet-100 text-violet-600',
       href: '/app/listings',
     },
     {
@@ -125,7 +125,7 @@ export default async function DashboardPage() {
       label: t('walletBalance'),
       value: `${(walletBalance / 100).toFixed(2)} ${currency}`,
       icon: Wallet,
-      color: 'bg-emerald-100 text-emerald-600',
+      color: 'bg-emerald-100 text-purple-600',
       href: '/app/wallet',
     },
   ];
@@ -208,14 +208,14 @@ export default async function DashboardPage() {
               href={action.href}
               className={`group flex items-center gap-4 rounded-xl border p-4 transition-all hover:shadow-md ${
                 action.primary
-                  ? 'border-teal-200 bg-teal-50 hover:bg-teal-100'
+                  ? 'border-violet-200 bg-violet-50 hover:bg-violet-100'
                   : 'border-gray-200 bg-white hover:bg-gray-50'
               }`}
             >
               <div
                 className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
                   action.primary
-                    ? 'bg-teal-500 text-white'
+                    ? 'bg-violet-500 text-white'
                     : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
                 }`}
               >
@@ -224,14 +224,14 @@ export default async function DashboardPage() {
               <div>
                 <p
                   className={`font-semibold ${
-                    action.primary ? 'text-teal-700' : 'text-gray-900'
+                    action.primary ? 'text-violet-700' : 'text-gray-900'
                   }`}
                 >
                   {action.label}
                 </p>
                 <p
                   className={`text-xs ${
-                    action.primary ? 'text-teal-600' : 'text-gray-500'
+                    action.primary ? 'text-violet-600' : 'text-gray-500'
                   }`}
                 >
                   {action.description}

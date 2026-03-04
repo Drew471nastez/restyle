@@ -83,18 +83,18 @@ export default function CountrySelector() {
               onClick={() => setSelected(country.code)}
               className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors ${
                 selected === country.code
-                  ? 'bg-teal-50'
+                  ? 'bg-violet-50'
                   : 'hover:bg-gray-50'
               }`}
             >
               <span className="text-xl leading-none">{country.flag}</span>
               <span className={`text-sm ${
-                selected === country.code ? 'font-semibold text-teal-700' : 'text-gray-700'
+                selected === country.code ? 'font-semibold text-violet-700' : 'text-gray-700'
               }`}>
                 {country.name}
               </span>
               {selected === country.code && (
-                <svg className="ml-auto h-4 w-4 text-teal-500" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <svg className="ml-auto h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
               )}
@@ -106,7 +106,7 @@ export default function CountrySelector() {
         <div className="px-5 py-4 border-t border-gray-100">
           <button
             onClick={handleConfirm}
-            className="w-full h-10 bg-teal-500 text-white rounded-lg text-sm font-semibold hover:bg-teal-600 transition-colors"
+            className="w-full h-10 bg-violet-500 text-white rounded-lg text-sm font-semibold hover:bg-violet-600 transition-colors"
           >
             Continue
           </button>

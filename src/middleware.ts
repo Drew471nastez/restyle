@@ -5,9 +5,12 @@ import { createServerClient } from '@supabase/ssr';
 
 // Routes that require authentication (after locale prefix)
 const PROTECTED_PATHS = [
-  '/app',
   '/checkout',
   '/admin',
+  '/sell',
+  '/settings',
+  '/wallet',
+  '/favorites',
 ];
 
 function isProtectedPath(pathname: string): boolean {
@@ -50,7 +53,6 @@ export default async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      // For as-needed mode: only add locale prefix for non-default locale
       const isRomanian = pathname.startsWith('/ro');
       const loginPath = isRomanian ? '/ro/login' : '/login';
       const loginUrl = new URL(loginPath, request.url);

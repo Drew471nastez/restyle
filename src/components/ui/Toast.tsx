@@ -42,14 +42,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   const icons = {
-    success: <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />,
+    success: <CheckCircle2 className="h-5 w-5 text-purple-500 shrink-0" />,
     error: <XCircle className="h-5 w-5 text-red-500 shrink-0" />,
     warning: <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />,
     info: <Info className="h-5 w-5 text-blue-500 shrink-0" />,
   };
 
   const borders = {
-    success: 'border-l-emerald-500',
+    success: 'border-l-purple-500',
     error: 'border-l-red-500',
     warning: 'border-l-amber-500',
     info: 'border-l-blue-500',

@@ -49,7 +49,7 @@ export default function SignupPage() {
         password,
         options: {
           data: { username },
-          emailRedirectTo: `${window.location.origin}/callback?next=/app`,
+          emailRedirectTo: `${window.location.origin}/callback?next=/`,
         },
       });
 
@@ -76,7 +76,7 @@ export default function SignupPage() {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/callback?next=/app`,
+          redirectTo: `${window.location.origin}/callback?next=/`,
         },
       });
     } catch {
@@ -89,8 +89,8 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="w-full max-w-md text-center">
-          <div className="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-teal-50 mb-6">
-            <Mail className="h-10 w-10 text-teal-500" />
+          <div className="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-violet-50 mb-6">
+            <Mail className="h-10 w-10 text-violet-500" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-3">Check your email</h1>
           <p className="text-gray-500 text-sm leading-relaxed mb-2">
@@ -110,7 +110,7 @@ export default function SignupPage() {
           </div>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center h-11 px-8 rounded-xl bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition-colors"
+            className="inline-flex items-center justify-center h-11 px-8 rounded-xl bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition-colors"
           >
             Back to login
           </Link>
@@ -122,7 +122,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-400 items-center justify-center overflow-hidden">
+      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-violet-600 via-violet-500 to-purple-400 items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-16 right-16 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
           <div className="absolute bottom-16 left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
@@ -132,7 +132,7 @@ export default function SignupPage() {
             <span className="text-white font-bold text-2xl">R</span>
           </div>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">Join ReStyle today</h2>
-          <p className="text-teal-100 text-base leading-relaxed mb-10">
+          <p className="text-violet-100 text-base leading-relaxed mb-10">
             Buy and sell pre-loved fashion. Sustainable style starts here.
           </p>
           <div className="space-y-3">
@@ -142,7 +142,7 @@ export default function SignupPage() {
               ['✓', 'Fast payouts to your bank'],
               ['✓', 'Millions of buyers waiting'],
             ].map(([icon, text]) => (
-              <div key={text} className="flex items-center gap-3 text-sm text-teal-100">
+              <div key={text} className="flex items-center gap-3 text-sm text-violet-100">
                 <span className="font-bold text-white">{icon}</span>
                 {text}
               </div>
@@ -157,7 +157,7 @@ export default function SignupPage() {
           {/* Mobile logo */}
           <div className="text-center mb-6 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-9 h-9 bg-teal-500 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-violet-500 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-base">R</span>
               </div>
               <span className="text-xl font-bold text-gray-900">ReStyle</span>
@@ -219,7 +219,7 @@ export default function SignupPage() {
                   required
                   minLength={3}
                   maxLength={30}
-                  className="w-full rounded-xl border border-gray-200 pl-8 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 outline-none transition-all"
+                  className="w-full rounded-xl border border-gray-200 pl-8 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 outline-none transition-all"
                   placeholder="yourname"
                 />
               </div>
@@ -237,7 +237,7 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 outline-none transition-all"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 outline-none transition-all"
                 placeholder="you@example.com"
               />
             </div>
@@ -255,7 +255,7 @@ export default function SignupPage() {
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 outline-none transition-all"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 outline-none transition-all"
                   placeholder="Min. 8 characters"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -270,7 +270,7 @@ export default function SignupPage() {
                       key={i}
                       className={`h-1 flex-1 rounded-full transition-colors ${
                         password.length >= i * 3
-                          ? password.length < 8 ? 'bg-amber-400' : 'bg-emerald-400'
+                          ? password.length < 8 ? 'bg-amber-400' : 'bg-purple-400'
                           : 'bg-gray-200'
                       }`}
                     />
@@ -294,7 +294,7 @@ export default function SignupPage() {
                   className={`w-full rounded-xl border px-4 py-3 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 outline-none transition-all ${
                     confirmPassword && password !== confirmPassword
                       ? 'border-red-300 focus:border-red-400 focus:ring-red-500/10'
-                      : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500/10'
+                      : 'border-gray-200 focus:border-violet-500 focus:ring-violet-500/10'
                   }`}
                   placeholder="••••••••"
                 />
@@ -302,22 +302,22 @@ export default function SignupPage() {
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
                 {confirmPassword && password === confirmPassword && (
-                  <CheckCircle2 className="absolute right-9 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
+                  <CheckCircle2 className="absolute right-9 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 )}
               </div>
             </div>
 
             <p className="text-xs text-gray-400 leading-relaxed">
               By signing up, you agree to our{' '}
-              <Link href="/terms" className="text-teal-500 hover:text-teal-600">Terms of Service</Link>{' '}
+              <Link href="/terms" className="text-violet-500 hover:text-violet-600">Terms of Service</Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-teal-500 hover:text-teal-600">Privacy Policy</Link>.
+              <Link href="/privacy" className="text-violet-500 hover:text-violet-600">Privacy Policy</Link>.
             </p>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-teal-500 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="w-full rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {loading ? 'Creating account…' : t('createAccount')}
@@ -326,7 +326,7 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             {t('haveAccount')}{' '}
-            <Link href="/login" className="font-semibold text-teal-500 hover:text-teal-600 transition-colors">
+            <Link href="/login" className="font-semibold text-violet-500 hover:text-violet-600 transition-colors">
               {t('login')}
             </Link>
           </p>

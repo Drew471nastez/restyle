@@ -158,7 +158,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-teal-500" />
+        <Loader2 className="w-6 h-6 animate-spin text-violet-500" />
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function SettingsPage() {
             : 'bg-white border-red-200 text-red-800'
         }`}>
           {toast.type === 'success'
-            ? <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+            ? <CheckCircle2 className="h-5 w-5 text-purple-500 shrink-0" />
             : <XCircle className="h-5 w-5 text-red-500 shrink-0" />}
           {toast.msg}
         </div>
@@ -194,13 +194,13 @@ export default function SettingsPage() {
                     i < SIDEBAR_ITEMS.length - 1 ? 'border-b border-gray-100' : ''
                   } ${
                     activeTab === item.id
-                      ? 'bg-teal-50 text-teal-700 font-semibold'
+                      ? 'bg-violet-50 text-violet-700 font-semibold'
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <item.icon className={`h-4 w-4 shrink-0 ${activeTab === item.id ? 'text-teal-500' : 'text-gray-400'}`} />
+                  <item.icon className={`h-4 w-4 shrink-0 ${activeTab === item.id ? 'text-violet-500' : 'text-gray-400'}`} />
                   {item.label}
-                  <ChevronRight className={`h-4 w-4 ml-auto ${activeTab === item.id ? 'text-teal-400' : 'text-gray-300'}`} />
+                  <ChevronRight className={`h-4 w-4 ml-auto ${activeTab === item.id ? 'text-violet-400' : 'text-gray-300'}`} />
                 </button>
               ))}
             </nav>
@@ -211,7 +211,7 @@ export default function SettingsPage() {
             <select
               value={activeTab}
               onChange={(e) => setActiveTab(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-700 bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-700 bg-white focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
             >
               {SIDEBAR_ITEMS.map((item) => (
                 <option key={item.id} value={item.id}>{item.label}</option>
@@ -274,7 +274,7 @@ export default function SettingsPage() {
                         onChange={(e) => setProfile((p) => ({ ...p, display_name: e.target.value }))}
                         placeholder="Your full name"
                         maxLength={60}
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                       />
                     </div>
 
@@ -301,7 +301,7 @@ export default function SettingsPage() {
                       placeholder="Tell others about yourself…"
                       rows={3}
                       maxLength={200}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-none"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none resize-none"
                     />
                     <p className="text-xs text-gray-400 mt-1 text-right">{(profile.bio || '').length}/200</p>
                   </div>
@@ -320,7 +320,7 @@ export default function SettingsPage() {
                       <select
                         value={profile.country}
                         onChange={(e) => setProfile((p) => ({ ...p, country: e.target.value }))}
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                       >
                         {[
                           ['RO', '🇷🇴 Romania'], ['GB', '🇬🇧 United Kingdom'], ['FR', '🇫🇷 France'],
@@ -341,7 +341,7 @@ export default function SettingsPage() {
                         value={profile.city || ''}
                         onChange={(e) => setProfile((p) => ({ ...p, city: e.target.value }))}
                         placeholder="Your city"
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                       />
                     </div>
                   </div>
@@ -350,7 +350,7 @@ export default function SettingsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-2 h-10 px-6 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 disabled:opacity-60 transition-colors"
+                  className="flex items-center gap-2 h-10 px-6 rounded-lg bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 disabled:opacity-60 transition-colors"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {saving ? 'Saving…' : 'Save changes'}
@@ -368,8 +368,8 @@ export default function SettingsPage() {
                     <div>
                       <p className="text-sm text-gray-900">{userEmail}</p>
                       <div className="flex items-center gap-1.5 mt-1">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="text-xs text-emerald-600 font-medium">Verified</span>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-purple-500" />
+                        <span className="text-xs text-purple-600 font-medium">Verified</span>
                       </div>
                     </div>
                   </div>
@@ -384,7 +384,7 @@ export default function SettingsPage() {
                       value={profile.phone || ''}
                       onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
                       placeholder="+40 123 456 789"
-                      className="flex-1 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                      className="flex-1 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                     />
                     <button
                       onClick={async () => {
@@ -395,7 +395,7 @@ export default function SettingsPage() {
                         } catch { showToast('error', 'Failed to save phone.'); }
                         finally { setSaving(false); }
                       }}
-                      className="h-10 px-4 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition"
+                      className="h-10 px-4 rounded-lg bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition"
                     >
                       Save
                     </button>
@@ -414,7 +414,7 @@ export default function SettingsPage() {
                         minLength={8}
                         required
                         placeholder="Min. 8 characters"
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                       />
                     </div>
                     <div>
@@ -425,7 +425,7 @@ export default function SettingsPage() {
                         minLength={8}
                         required
                         placeholder="Repeat password"
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                       />
                     </div>
                     <button
@@ -461,7 +461,7 @@ export default function SettingsPage() {
                     <select
                       value={profile.country}
                       onChange={(e) => setProfile((p) => ({ ...p, country: e.target.value }))}
-                      className="w-full max-w-xs rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                      className="w-full max-w-xs rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                     >
                       {[['RO', '🇷🇴 Romania'], ['GB', '🇬🇧 UK'], ['FR', '🇫🇷 France'], ['DE', '🇩🇪 Germany']].map(([code, label]) => (
                         <option key={code} value={code}>{label}</option>
@@ -479,7 +479,7 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <h2 className="text-sm font-semibold text-gray-900 mb-2">Wallet & payouts</h2>
                   <p className="text-sm text-gray-500 mb-4">Add your IBAN to receive payouts when you sell items.</p>
-                  <button className="flex items-center gap-2 h-10 px-5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition">
+                  <button className="flex items-center gap-2 h-10 px-5 rounded-lg bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition">
                     <CreditCard className="h-4 w-4" />
                     Add bank account
                   </button>
@@ -511,7 +511,7 @@ export default function SettingsPage() {
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" defaultChecked={item.defaultOn} className="sr-only peer" />
-                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-violet-500"></div>
                     </label>
                   </div>
                 ))}
@@ -535,7 +535,7 @@ export default function SettingsPage() {
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" defaultChecked className="sr-only peer" />
-                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-violet-500"></div>
                     </label>
                   </div>
                 ))}

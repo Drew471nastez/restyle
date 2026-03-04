@@ -72,14 +72,14 @@ export default function SellPage() {
                     <X className="h-3 w-3" />
                   </button>
                   {i === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[10px] font-medium bg-teal-500 text-white px-1.5 py-0.5 rounded">
+                    <span className="absolute bottom-1 left-1 text-[10px] font-medium bg-violet-500 text-white px-1.5 py-0.5 rounded">
                       Cover
                     </span>
                   )}
                 </div>
               ))}
               {images.length < 5 && (
-                <label className="flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-teal-500 hover:text-teal-500">
+                <label className="flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-violet-500 hover:text-violet-500">
                   <Camera className="h-6 w-6" />
                   <span className="text-[10px] font-medium">Add photo</span>
                   <input type="file" accept="image/*" multiple onChange={handleImageChange} className="hidden" />
@@ -100,7 +100,7 @@ export default function SellPage() {
                 placeholder={t('titlePlaceholder')}
                 required
                 maxLength={100}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
               />
             </div>
 
@@ -113,7 +113,7 @@ export default function SellPage() {
                 required
                 rows={4}
                 maxLength={1000}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-none"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none resize-none"
               />
             </div>
 
@@ -123,7 +123,7 @@ export default function SellPage() {
                 id="brand"
                 name="brand"
                 placeholder={t('brandPlaceholder')}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
               />
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function SellPage() {
                   name="category"
                   required
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                 >
                   <option value="">{t('selectCategory')}</option>
                   {CATEGORIES.map((cat) => (
@@ -152,7 +152,7 @@ export default function SellPage() {
                 <label className="block text-sm text-gray-700 mb-1">{t('subcategory')}</label>
                 <select
                   name="subcategory"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                 >
                   <option value="">{t('selectSubcategory')}</option>
                   {currentCategory?.subcategories.map((sub) => (
@@ -168,7 +168,7 @@ export default function SellPage() {
                 <select
                   name="size"
                   required
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                 >
                   <option value="">{t('selectSize')}</option>
                   {SIZES.clothing.map((size) => (
@@ -182,7 +182,7 @@ export default function SellPage() {
                 <select
                   name="condition"
                   required
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
                 >
                   <option value="">{t('selectCondition')}</option>
                   {CONDITIONS.map((cond) => (
@@ -204,7 +204,7 @@ export default function SellPage() {
                 min="0.01"
                 placeholder="0.00"
                 required
-                className="w-full rounded-lg border border-gray-200 pl-14 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                className="w-full rounded-lg border border-gray-200 pl-14 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
               />
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">RON</span>
             </div>
@@ -218,7 +218,7 @@ export default function SellPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-teal-500 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-violet-500 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

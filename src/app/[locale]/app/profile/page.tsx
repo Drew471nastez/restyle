@@ -184,7 +184,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
       </div>
     );
   }
@@ -207,14 +207,14 @@ export default function ProfilePage() {
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt={profile.username} className="h-20 w-20 rounded-full object-cover border-2 border-gray-100" />
               ) : (
-                <div className="h-20 w-20 rounded-full bg-teal-100 flex items-center justify-center border-2 border-gray-100">
-                  <User className="h-8 w-8 text-teal-500" />
+                <div className="h-20 w-20 rounded-full bg-violet-100 flex items-center justify-center border-2 border-gray-100">
+                  <User className="h-8 w-8 text-violet-500" />
                 </div>
               )}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-teal-500 text-white hover:bg-teal-600 transition"
+                className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-violet-500 text-white hover:bg-violet-600 transition"
               >
                 <Camera className="h-3 w-3" />
               </button>
@@ -225,7 +225,7 @@ export default function ProfilePage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-bold text-gray-900 truncate">{profile?.display_name || profile?.username}</h1>
-                {profile?.is_verified && <Shield className="h-4 w-4 text-teal-500 shrink-0" />}
+                {profile?.is_verified && <Shield className="h-4 w-4 text-violet-500 shrink-0" />}
               </div>
               <p className="text-sm text-gray-500">@{profile?.username}</p>
 
@@ -274,20 +274,20 @@ export default function ProfilePage() {
                 value={editDisplayName}
                 onChange={(e) => setEditDisplayName(e.target.value)}
                 placeholder={t('displayNamePlaceholder')}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
               />
               <textarea
                 value={editBio}
                 onChange={(e) => setEditBio(e.target.value)}
                 placeholder={t('bioPlaceholder')}
                 rows={3}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-none"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none resize-none"
               />
               <div className="flex gap-2">
                 <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                   {t('cancel')}
                 </button>
-                <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 disabled:opacity-50 transition">
+                <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-violet-500 rounded-lg hover:bg-violet-600 disabled:opacity-50 transition">
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t('saveChanges')}
                 </button>
               </div>
@@ -308,7 +308,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Sell CTA */}
-        <Link href="/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-teal-500 text-white rounded-xl text-sm font-semibold hover:bg-teal-600 transition mb-6">
+        <Link href="/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition mb-6">
           <Plus className="h-4 w-4" />
           {t('listAnItem')}
         </Link>
@@ -321,7 +321,7 @@ export default function ProfilePage() {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium border-b-2 -mb-px transition ${
-                  activeTab === tab.key ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                  activeTab === tab.key ? 'border-violet-500 text-violet-600' : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <tab.icon className="h-4 w-4" />
@@ -367,7 +367,7 @@ export default function ProfilePage() {
                     <Package className="h-12 w-12 text-gray-200 mx-auto mb-4" />
                     <p className="text-gray-900 font-medium mb-1">{t('startSellingCTA')}</p>
                     <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">{t('startSellingDescription')}</p>
-                    <Link href="/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition">
+                    <Link href="/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition">
                       <Plus className="h-4 w-4" />
                       {t('listAnItem')}
                     </Link>

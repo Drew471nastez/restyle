@@ -17,7 +17,7 @@ export function AppTopBar() {
         {/* Logo for desktop */}
         <div className="hidden md:flex items-center gap-2">
           <Link href="/" className="flex items-center gap-1.5">
-            <div className="w-7 h-7 bg-teal-500 rounded-lg flex items-center justify-center">
+            <div className="w-7 h-7 bg-violet-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">R</span>
             </div>
             <span className="text-lg font-bold text-gray-900">ReStyle</span>
@@ -56,7 +56,7 @@ function NavLink({ href, pathname, children }: { href: string; pathname: string;
   return (
     <Link
       href={href}
-      className={`text-sm font-medium transition ${isActive ? 'text-teal-600' : 'text-gray-500 hover:text-gray-900'}`}
+      className={`text-sm font-medium transition ${isActive ? 'text-violet-600' : 'text-gray-500 hover:text-gray-900'}`}
     >
       {children}
     </Link>

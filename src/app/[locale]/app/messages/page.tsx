@@ -162,7 +162,7 @@ export default async function MessagesPage() {
                   index < conversations.length - 1
                     ? 'border-b border-gray-100'
                     : ''
-                } ${unread > 0 ? 'bg-teal-50/30' : ''}`}
+                } ${unread > 0 ? 'bg-violet-50/30' : ''}`}
               >
                 {/* Avatar */}
                 <div className="relative shrink-0">
@@ -178,7 +178,7 @@ export default async function MessagesPage() {
                     </div>
                   )}
                   {unread > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-teal-500 text-[10px] font-bold text-white">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-violet-500 text-[10px] font-bold text-white">
                       {unread > 9 ? '9+' : unread}
                     </span>
                   )}

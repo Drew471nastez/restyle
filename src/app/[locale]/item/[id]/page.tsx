@@ -91,7 +91,7 @@ export default async function ItemPage({ params }: ItemPageProps) {
                   <div
                     key={index}
                     className={`aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-colors ${
-                      index === 0 ? 'border-teal-500' : 'border-gray-100 hover:border-gray-300'
+                      index === 0 ? 'border-violet-500' : 'border-gray-100 hover:border-gray-300'
                     }`}
                   >
                     <img
@@ -134,14 +134,14 @@ export default async function ItemPage({ params }: ItemPageProps) {
             <div className="space-y-3">
               <Link
                 href={`/checkout/${listing.id}`}
-                className="flex items-center justify-center w-full rounded-full bg-teal-500 px-6 py-3.5 text-sm font-semibold text-white hover:bg-teal-600 transition-colors"
+                className="flex items-center justify-center w-full rounded-full bg-violet-500 px-6 py-3.5 text-sm font-semibold text-white hover:bg-violet-600 transition-colors"
               >
                 {t('buyNow')}
               </Link>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  className="rounded-full border border-teal-500 px-4 py-3 text-sm font-semibold text-teal-500 hover:bg-teal-50 transition-colors"
+                  className="rounded-full border border-violet-500 px-4 py-3 text-sm font-semibold text-violet-500 hover:bg-violet-50 transition-colors"
                 >
                   {t('makeOffer')}
                 </button>
@@ -208,13 +208,13 @@ export default async function ItemPage({ params }: ItemPageProps) {
                       {seller.username}
                     </span>
                     {seller.is_verified && (
-                      <svg className="h-4 w-4 text-teal-500 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="h-4 w-4 text-violet-500 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                         <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" clipRule="evenodd" />
                         <path fillRule="evenodd" d="M15.61 10.186a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
                       </svg>
                     )}
                     {seller.is_pro && (
-                      <span className="bg-teal-50 text-teal-600 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded">
+                      <span className="bg-violet-50 text-violet-600 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded">
                         PRO
                       </span>
                     )}
@@ -232,7 +232,7 @@ export default async function ItemPage({ params }: ItemPageProps) {
                 </div>
                 <Link
                   href={`/profile/${seller.id}`}
-                  className="text-xs font-medium text-teal-500 hover:text-teal-600 transition-colors"
+                  className="text-xs font-medium text-violet-500 hover:text-violet-600 transition-colors"
                 >
                   {t('viewProfile')}
                 </Link>

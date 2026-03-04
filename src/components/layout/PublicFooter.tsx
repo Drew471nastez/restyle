@@ -17,7 +17,7 @@ export function PublicFooter() {
           {/* Brand */}
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="inline-flex items-center gap-1.5">
-              <div className="w-7 h-7 bg-teal-500 rounded-lg flex items-center justify-center">
+              <div className="w-7 h-7 bg-violet-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">R</span>
               </div>
               <span className="text-lg font-bold text-gray-900">ReStyle</span>
@@ -31,9 +31,9 @@ export function PublicFooter() {
           <div>
             <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">{t('about')}</h3>
             <ul className="mt-3 space-y-2.5">
-              <li><Link href="/how-it-works" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('howItWorks')}</Link></li>
-              <li><Link href="/about" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('aboutUs')}</Link></li>
-              <li><Link href="/sustainability" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('sustainability')}</Link></li>
+              <li><Link href="/how-it-works" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('howItWorks')}</Link></li>
+              <li><Link href="/about" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('aboutUs')}</Link></li>
+              <li><Link href="/sustainability" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('sustainability')}</Link></li>
             </ul>
           </div>
 
@@ -41,9 +41,9 @@ export function PublicFooter() {
           <div>
             <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">{t('support')}</h3>
             <ul className="mt-3 space-y-2.5">
-              <li><Link href="/help" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('helpCenter')}</Link></li>
-              <li><Link href="/safety" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('safety')}</Link></li>
-              <li><Link href="/contact" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('contact')}</Link></li>
+              <li><Link href="/help" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('helpCenter')}</Link></li>
+              <li><Link href="/safety" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('safety')}</Link></li>
+              <li><Link href="/contact" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('contact')}</Link></li>
             </ul>
           </div>
 
@@ -51,9 +51,9 @@ export function PublicFooter() {
           <div>
             <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">{t('legal')}</h3>
             <ul className="mt-3 space-y-2.5">
-              <li><Link href="/terms" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('terms')}</Link></li>
-              <li><Link href="/privacy" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('privacy')}</Link></li>
-              <li><Link href="/cookies" className="text-sm text-gray-500 hover:text-teal-600 transition">{t('cookies')}</Link></li>
+              <li><Link href="/terms" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('terms')}</Link></li>
+              <li><Link href="/privacy" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('privacy')}</Link></li>
+              <li><Link href="/cookies" className="text-sm text-gray-500 hover:text-violet-600 transition">{t('cookies')}</Link></li>
             </ul>
           </div>
         </div>
@@ -63,8 +63,8 @@ export function PublicFooter() {
             &copy; {new Date().getFullYear()} ReStyle. {t('allRightsReserved')}
           </p>
           <div className="flex items-center gap-4">
-            <Link href="/terms" className="text-xs text-gray-400 hover:text-teal-600 transition">{t('terms')}</Link>
-            <Link href="/privacy" className="text-xs text-gray-400 hover:text-teal-600 transition">{t('privacy')}</Link>
+            <Link href="/terms" className="text-xs text-gray-400 hover:text-violet-600 transition">{t('terms')}</Link>
+            <Link href="/privacy" className="text-xs text-gray-400 hover:text-violet-600 transition">{t('privacy')}</Link>
           </div>
         </div>
       </div>

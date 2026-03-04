@@ -128,8 +128,8 @@ export default async function WalletPage() {
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-100">
-              <Wallet className="h-5 w-5 text-teal-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100">
+              <Wallet className="h-5 w-5 text-violet-600" />
             </div>
             <p className="text-sm font-medium text-gray-500">
               {t('availableBalance')}
@@ -163,7 +163,7 @@ export default async function WalletPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
-              <CreditCard className="h-5 w-5 text-emerald-600" />
+              <CreditCard className="h-5 w-5 text-purple-600" />
             </div>
             <p className="text-sm font-medium text-gray-500">
               {t('totalEarned')}
@@ -191,7 +191,7 @@ export default async function WalletPage() {
           <button
             type="submit"
             disabled={!canPayout}
-            className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowUpRight className="h-4 w-4" />
             {t('requestPayout')}

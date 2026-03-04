@@ -19,8 +19,8 @@ export function PublicHeader() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Hide on app routes (they have their own layout)
-  if (pathname.startsWith('/app') || pathname.startsWith('/admin')) return null;
+  // Hide on admin routes
+  if (pathname.startsWith('/admin')) return null;
 
   // Close user menu on outside click
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -37,50 +37,46 @@ export function PublicHeader() {
   return (
     <>
       <header className="sticky top-0 z-50 bg-white shadow-sm">
-        {/* Main bar */}
         <div className="w-full border-b border-gray-100">
           <div className="mx-auto max-w-[1440px] px-4 lg:px-8">
             <div className="flex h-14 items-center gap-4">
-              {/* Logo */}
               <Link href="/" className="shrink-0 flex items-center gap-2">
-                <div className="w-8 h-8 bg-teal-500 rounded-xl flex items-center justify-center">
+                <div className="w-8 h-8 bg-violet-500 rounded-xl flex items-center justify-center">
                   <span className="text-white font-bold text-base">R</span>
                 </div>
                 <span className="text-xl font-bold text-gray-900 hidden sm:block tracking-tight">ReStyle</span>
               </Link>
 
-              {/* Desktop Search */}
               <div className="hidden md:flex flex-1 max-w-2xl">
                 <div className="relative w-full">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     placeholder={t('common.search')}
-                    className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+                    className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                   />
                 </div>
               </div>
 
-              {/* Desktop Nav */}
               <nav className="hidden md:flex items-center gap-1 ml-auto">
                 {user ? (
                   <>
                     <Link
                       href="/sell"
-                      className="inline-flex items-center gap-2 h-9 px-4 bg-teal-500 text-white rounded-lg text-sm font-semibold hover:bg-teal-600 transition"
+                      className="inline-flex items-center gap-2 h-9 px-4 bg-violet-500 text-white rounded-lg text-sm font-semibold hover:bg-violet-600 transition"
                     >
                       <Plus className="h-4 w-4" />
-                      {t('common.sell')}
+                      Upload
                     </Link>
                     <Link
-                      href="/app/favorites"
+                      href="/favorites"
                       className="relative h-9 w-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
                       title="Favorites"
                     >
                       <Heart className="h-5 w-5" />
                     </Link>
                     <Link
-                      href="/app/messages"
+                      href="/messages"
                       className="relative h-9 w-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
                       title="Messages"
                     >
@@ -93,7 +89,6 @@ export function PublicHeader() {
                       <Bell className="h-5 w-5" />
                     </button>
 
-                    {/* User avatar + dropdown */}
                     <div className="relative ml-1" ref={userMenuRef}>
                       <button
                         onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -102,33 +97,31 @@ export function PublicHeader() {
                         {profile?.avatar_url ? (
                           <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
                         ) : (
-                          <div className="h-7 w-7 rounded-full bg-teal-100 flex items-center justify-center">
-                            <User className="h-4 w-4 text-teal-600" />
+                          <div className="h-7 w-7 rounded-full bg-violet-100 flex items-center justify-center">
+                            <User className="h-4 w-4 text-violet-600" />
                           </div>
                         )}
                         <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
                       </button>
 
-                      {/* Dropdown */}
                       {userMenuOpen && (
                         <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50">
-                          {/* User info */}
                           <div className="px-4 py-2.5 border-b border-gray-100">
-                            <p className="text-sm font-semibold text-gray-900">{profile?.display_name || profile?.username}</p>
-                            <p className="text-xs text-gray-500">@{profile?.username}</p>
+                            <p className="text-sm font-semibold text-gray-900">{profile?.display_name || profile?.username || 'User'}</p>
+                            <p className="text-xs text-gray-500">@{profile?.username || 'user'}</p>
                           </div>
 
                           <div className="py-1">
-                            <Link href="/app/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href={`/profile/${profile?.username || 'me'}`} onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <User className="h-4 w-4 text-gray-400" /> Profile
                             </Link>
-                            <Link href="/app/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <Heart className="h-4 w-4 text-gray-400" /> Favorites
                             </Link>
-                            <Link href="/app/orders" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/orders" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <ShoppingBag className="h-4 w-4 text-gray-400" /> My orders
                             </Link>
-                            <Link href="/app/wallet" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/wallet" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <Wallet className="h-4 w-4 text-gray-400" /> Wallet
                             </Link>
                           </div>
@@ -152,49 +145,30 @@ export function PublicHeader() {
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/login"
-                      className="h-9 px-4 flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition"
-                    >
+                    <Link href="/login" className="h-9 px-4 flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition">
                       {t('common.login')}
                     </Link>
-                    <Link
-                      href="/signup"
-                      className="h-9 px-4 flex items-center bg-teal-500 text-white rounded-lg text-sm font-semibold hover:bg-teal-600 transition"
-                    >
+                    <Link href="/signup" className="h-9 px-4 flex items-center bg-violet-500 text-white rounded-lg text-sm font-semibold hover:bg-violet-600 transition">
                       {t('common.signup')}
                     </Link>
                   </>
                 )}
               </nav>
 
-              {/* Mobile Actions */}
               <div className="flex items-center gap-0.5 ml-auto md:hidden">
-                <button
-                  onClick={() => { setSearchOpen(!searchOpen); setMobileMenuOpen(false); }}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100"
-                >
+                <button onClick={() => { setSearchOpen(!searchOpen); setMobileMenuOpen(false); }} className="h-9 w-9 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100">
                   <Search className="h-5 w-5" />
                 </button>
                 {user ? (
-                  <Link
-                    href="/sell"
-                    className="h-9 w-9 flex items-center justify-center rounded-lg bg-teal-500 text-white"
-                  >
+                  <Link href="/sell" className="h-9 w-9 flex items-center justify-center rounded-lg bg-violet-500 text-white">
                     <Plus className="h-5 w-5" />
                   </Link>
                 ) : (
-                  <Link
-                    href="/login"
-                    className="h-9 px-3 flex items-center bg-teal-500 text-white rounded-lg text-sm font-semibold"
-                  >
+                  <Link href="/login" className="h-9 px-3 flex items-center bg-violet-500 text-white rounded-lg text-sm font-semibold">
                     {t('common.login')}
                   </Link>
                 )}
-                <button
-                  onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setSearchOpen(false); }}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100"
-                >
+                <button onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setSearchOpen(false); }} className="h-9 w-9 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100">
                   {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
               </div>
@@ -202,7 +176,6 @@ export function PublicHeader() {
           </div>
         </div>
 
-        {/* Desktop Category Nav */}
         <div className="hidden md:block w-full bg-white border-b border-gray-100">
           <div className="mx-auto max-w-[1440px] px-4 lg:px-8">
             <nav className="flex items-center gap-1 h-10 overflow-x-auto no-scrollbar">
@@ -214,11 +187,7 @@ export function PublicHeader() {
                 { href: '/browse?category=bags', label: t('categories.bags') },
                 { href: '/browse?category=accessories', label: t('categories.accessories') },
               ].map((cat) => (
-                <Link
-                  key={cat.href}
-                  href={cat.href}
-                  className="shrink-0 px-3 h-full flex items-center text-sm text-gray-600 hover:text-teal-600 hover:border-b-2 hover:border-teal-500 transition-colors font-medium"
-                >
+                <Link key={cat.href} href={cat.href} className="shrink-0 px-3 h-full flex items-center text-sm text-gray-600 hover:text-violet-600 hover:border-b-2 hover:border-violet-500 transition-colors font-medium">
                   {cat.label}
                 </Link>
               ))}
@@ -226,22 +195,15 @@ export function PublicHeader() {
           </div>
         </div>
 
-        {/* Mobile Search */}
         {searchOpen && (
           <div className="border-t border-gray-100 px-4 py-3 md:hidden bg-white">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder={t('common.search')}
-                autoFocus
-                className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
-              />
+              <input type="text" placeholder={t('common.search')} autoFocus className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500" />
             </div>
           </div>
         )}
 
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="border-t border-gray-100 md:hidden bg-white">
             <nav className="px-4 py-3 space-y-0.5">
@@ -258,21 +220,19 @@ export function PublicHeader() {
                   {cat.label}
                 </Link>
               ))}
-
               <div className="my-2 border-t border-gray-100" />
-
               {user ? (
                 <>
-                  <Link href="/app/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href={`/profile/${profile?.username || 'me'}`} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <User className="h-4 w-4 text-gray-400" /> Profile
                   </Link>
-                  <Link href="/app/orders" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/orders" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <ShoppingBag className="h-4 w-4 text-gray-400" /> My orders
                   </Link>
-                  <Link href="/app/messages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/messages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <MessageCircle className="h-4 w-4 text-gray-400" /> Messages
                   </Link>
-                  <Link href="/app/wallet" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/wallet" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <Wallet className="h-4 w-4 text-gray-400" /> Wallet
                   </Link>
                   <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
@@ -290,7 +250,7 @@ export function PublicHeader() {
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     {t('common.login')}
                   </Link>
-                  <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-teal-600 hover:bg-teal-50 rounded-lg">
+                  <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-violet-600 hover:bg-violet-50 rounded-lg">
                     {t('common.signup')}
                   </Link>
                 </>

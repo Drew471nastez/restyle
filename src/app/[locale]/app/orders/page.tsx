@@ -131,7 +131,7 @@ export default async function OrdersPage({
           {activeTab === 'buying' && (
             <Link
               href="/browse"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-600"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
             >
               {t('browseCTA')}
             </Link>
@@ -163,7 +163,7 @@ export default async function OrdersPage({
                 <h3 className="truncate font-semibold text-gray-900">
                   {order.listing?.title || t('unknownItem')}
                 </h3>
-                <p className="mt-0.5 text-sm font-bold text-teal-600">
+                <p className="mt-0.5 text-sm font-bold text-violet-600">
                   {(order.total_price / 100).toFixed(2)} RON
                 </p>
                 <p className="mt-0.5 text-xs text-gray-400">
