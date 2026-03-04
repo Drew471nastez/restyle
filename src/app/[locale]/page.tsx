@@ -5,18 +5,21 @@ import { ArrowRight, ShieldCheck, Truck, CreditCard } from 'lucide-react';
 
 export default async function HomePage() {
   const t = await getTranslations();
-  const supabase = await createServerClient();
-
-  // Fetch featured/recent listings
-  const { data: featuredListings } = await supabase
-    .from('listings')
-    .select('*, profiles!seller_id(username, avatar_url)')
-    .eq('status', 'active')
-    .order('is_featured', { ascending: false })
-    .order('created_at', { ascending: false })
-    .limit(8);
-
-  const listings = featuredListings || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let listings: any[] = [];
+  try {
+    const supabase = await createServerClient();
+    const { data: featuredListings } = await supabase
+      .from('listings')
+      .select('*, profiles!seller_id(username, avatar_url)')
+      .eq('status', 'active')
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(8);
+    listings = featuredListings || [];
+  } catch {
+    // Supabase not configured or unreachable
+  }
 
   return (
     <div className="min-h-screen">
