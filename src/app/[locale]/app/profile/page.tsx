@@ -16,6 +16,10 @@ import {
   Plus,
   LogOut,
   Loader2,
+  MapPin,
+  Shield,
+  Calendar,
+  Pencil,
 } from 'lucide-react';
 
 interface Profile {
@@ -26,6 +30,9 @@ interface Profile {
   avatar_url: string | null;
   rating_avg: number;
   rating_count: number;
+  country: string;
+  city: string | null;
+  is_verified: boolean;
   created_at: string;
   last_active_at: string | null;
 }
@@ -37,6 +44,8 @@ interface ListingItem {
   currency: string;
   images: string[];
   status: string;
+  views_count: number;
+  favorites_count: number;
 }
 
 export default function ProfilePage() {
@@ -74,25 +83,22 @@ export default function ProfilePage() {
           setEditBio(data.bio || '');
         }
 
-        // Fetch listings
         const { data: listingsData } = await supabase
           .from('listings')
-          .select('id, title, price, currency, images, status')
+          .select('id, title, price, currency, images, status, views_count, favorites_count')
           .eq('seller_id', user.id)
           .order('created_at', { ascending: false });
         if (listingsData) setListings(listingsData);
 
-        // Fetch favorites
         const { data: favsData } = await supabase
           .from('favorites')
-          .select('listing_id, listings(id, title, price, currency, images, status)')
+          .select('listing_id, listings(id, title, price, currency, images, status, views_count, favorites_count)')
           .eq('user_id', user.id);
         if (favsData) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           setFavorites(favsData.map((f: any) => f.listings).filter(Boolean));
         }
 
-        // Fetch follower/following counts
         const { count: followers } = await supabase
           .from('follows')
           .select('*', { count: 'exact', head: true })
@@ -105,7 +111,6 @@ export default function ProfilePage() {
           .eq('follower_id', user.id);
         setFollowingCount(following || 0);
 
-        // Update last_active_at
         await supabase
           .from('profiles')
           .update({ last_active_at: new Date().toISOString() })
@@ -123,14 +128,11 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
-
     try {
       const fileExt = file.name.split('.').pop();
       const filePath = `${profile.id}/avatar.${fileExt}`;
-
       await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id);
       setProfile({ ...profile, avatar_url: publicUrl });
     } catch {
@@ -160,14 +162,15 @@ export default function ProfilePage() {
     const lastActive = new Date(profile.last_active_at);
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - lastActive.getTime()) / 60000);
-
     if (diffMinutes < 60) return t('activeToday');
-    if (diffMinutes < 1440) {
-      const hours = Math.floor(diffMinutes / 60);
-      return t('lastActive', { time: `${hours}h` });
-    }
-    const days = Math.floor(diffMinutes / 1440);
-    return t('lastActive', { time: `${days}d` });
+    if (diffMinutes < 1440) return t('lastActive', { time: `${Math.floor(diffMinutes / 60)}h` });
+    return t('lastActive', { time: `${Math.floor(diffMinutes / 1440)}d` });
+  }
+
+  function getMemberSince() {
+    if (!profile?.created_at) return '';
+    const d = new Date(profile.created_at);
+    return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
   const tabItems = [
@@ -187,254 +190,225 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pb-24">
-      {/* Top bar with settings */}
-      <div className="flex justify-end py-3">
-        <Link
-          href="/app/profile/settings"
-          className="h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition"
-        >
-          <Settings className="h-5 w-5" />
-        </Link>
-      </div>
-
-      {/* Profile Header */}
-      <div className="flex flex-col items-center text-center pb-6">
-        {/* Avatar */}
-        <div className="relative mb-3">
-          {profile?.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt={profile.username}
-              className="h-24 w-24 rounded-full object-cover border-2 border-white shadow-md"
-            />
-          ) : (
-            <div className="h-24 w-24 rounded-full bg-teal-100 flex items-center justify-center border-2 border-white shadow-md">
-              <User className="h-10 w-10 text-teal-500" />
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal-500 text-white hover:bg-teal-600 transition shadow-sm"
-          >
-            <Camera className="h-3.5 w-3.5" />
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="hidden"
-          />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-3xl mx-auto px-4 pb-24">
+        {/* Top bar */}
+        <div className="flex justify-end py-3">
+          <Link href="/settings" className="h-9 w-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition">
+            <Settings className="h-5 w-5" />
+          </Link>
         </div>
 
-        {/* Username */}
-        <h1 className="text-lg font-bold text-gray-900">@{profile?.username}</h1>
-
-        {/* Active status */}
-        <div className="flex items-center gap-1.5 mt-1">
-          <span className="h-2 w-2 rounded-full bg-green-400" />
-          <span className="text-xs text-gray-500">{getActiveStatus()}</span>
-        </div>
-
-        {/* Followers / Following */}
-        <div className="flex items-center gap-4 mt-3">
-          <button className="text-center">
-            <span className="text-sm font-semibold text-gray-900">{followerCount}</span>
-            <span className="text-xs text-gray-500 ml-1">{t('followers')}</span>
-          </button>
-          <div className="h-4 w-px bg-gray-200" />
-          <button className="text-center">
-            <span className="text-sm font-semibold text-gray-900">{followingCount}</span>
-            <span className="text-xs text-gray-500 ml-1">{t('following')}</span>
-          </button>
-        </div>
-
-        {/* Stars */}
-        {(profile?.rating_count ?? 0) > 0 && (
-          <div className="flex items-center gap-1 mt-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`h-4 w-4 ${star <= Math.round(profile?.rating_avg || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
-              />
-            ))}
-            <span className="text-xs text-gray-500 ml-1">({profile?.rating_count})</span>
-          </div>
-        )}
-
-        {/* Bio */}
-        {isEditing ? (
-          <div className="mt-4 w-full max-w-sm space-y-3">
-            <input
-              type="text"
-              value={editDisplayName}
-              onChange={(e) => setEditDisplayName(e.target.value)}
-              placeholder={t('displayNamePlaceholder')}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
-            />
-            <textarea
-              value={editBio}
-              onChange={(e) => setEditBio(e.target.value)}
-              placeholder={t('bioPlaceholder')}
-              rows={3}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
-            />
-            <div className="flex gap-2 justify-center">
+        {/* Profile card */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <div className="flex items-start gap-5">
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.username} className="h-20 w-20 rounded-full object-cover border-2 border-gray-100" />
+              ) : (
+                <div className="h-20 w-20 rounded-full bg-teal-100 flex items-center justify-center border-2 border-gray-100">
+                  <User className="h-8 w-8 text-teal-500" />
+                </div>
+              )}
               <button
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition"
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-teal-500 text-white hover:bg-teal-600 transition"
               >
-                {t('cancel')}
+                <Camera className="h-3 w-3" />
               </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-full hover:bg-teal-600 disabled:opacity-50 transition"
-              >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t('saveChanges')}
-              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
             </div>
-          </div>
-        ) : (
-          <>
-            {profile?.display_name && (
-              <p className="text-sm font-medium text-gray-700 mt-3">{profile.display_name}</p>
-            )}
-            {profile?.bio && (
-              <p className="text-sm text-gray-500 mt-1 max-w-xs">{profile.bio}</p>
-            )}
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-bold text-gray-900 truncate">{profile?.display_name || profile?.username}</h1>
+                {profile?.is_verified && <Shield className="h-4 w-4 text-teal-500 shrink-0" />}
+              </div>
+              <p className="text-sm text-gray-500">@{profile?.username}</p>
+
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <span className="h-2 w-2 rounded-full bg-green-400" />
+                <span className="text-xs text-gray-500">{getActiveStatus()}</span>
+              </div>
+
+              <div className="flex items-center gap-4 mt-3 text-sm">
+                <span><strong className="text-gray-900">{followerCount}</strong> <span className="text-gray-500">{t('followers')}</span></span>
+                <span><strong className="text-gray-900">{followingCount}</strong> <span className="text-gray-500">{t('following')}</span></span>
+                {(profile?.rating_count ?? 0) > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                    <strong className="text-gray-900">{profile?.rating_avg?.toFixed(1)}</strong>
+                    <span className="text-gray-500">({profile?.rating_count})</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Edit button - hidden on small screens, shown as full row below */}
             <button
-              onClick={() => setIsEditing(true)}
-              className="mt-3 text-xs font-medium text-teal-500 hover:text-teal-600 transition"
+              onClick={() => setIsEditing(!isEditing)}
+              className="hidden sm:flex shrink-0 items-center gap-1.5 h-9 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
             >
+              <Pencil className="h-3.5 w-3.5" />
               {t('editProfile')}
             </button>
-          </>
-        )}
-      </div>
+          </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex">
-          {tabItems.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === tab.key
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-              {tab.count > 0 && (
-                <span className="text-xs text-gray-400">({tab.count})</span>
+          {/* Mobile edit button */}
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="sm:hidden flex items-center justify-center gap-1.5 w-full mt-4 h-9 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            {t('editProfile')}
+          </button>
+
+          {/* Bio / edit section */}
+          {isEditing ? (
+            <div className="mt-5 pt-5 border-t border-gray-100 space-y-3">
+              <input
+                type="text"
+                value={editDisplayName}
+                onChange={(e) => setEditDisplayName(e.target.value)}
+                placeholder={t('displayNamePlaceholder')}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+              />
+              <textarea
+                value={editBio}
+                onChange={(e) => setEditBio(e.target.value)}
+                placeholder={t('bioPlaceholder')}
+                rows={3}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-none"
+              />
+              <div className="flex gap-2">
+                <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                  {t('cancel')}
+                </button>
+                <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 disabled:opacity-50 transition">
+                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t('saveChanges')}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {profile?.bio && (
+                <p className="text-sm text-gray-600 mt-4 pt-4 border-t border-gray-100">{profile.bio}</p>
               )}
-            </button>
-          ))}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
+                {profile?.country && (
+                  <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {profile.city ? `${profile.city}, ` : ''}{profile.country}</span>
+                )}
+                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Member since {getMemberSince()}</span>
+              </div>
+            </>
+          )}
         </div>
-      </div>
 
-      {/* Tab Content */}
-      <div className="py-6">
-        {activeItems.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {activeItems.map((item) => (
-              <Link
-                key={item.id}
-                href={`/item/${item.id}`}
-                className="group rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition-shadow"
+        {/* Sell CTA */}
+        <Link href="/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-teal-500 text-white rounded-xl text-sm font-semibold hover:bg-teal-600 transition mb-6">
+          <Plus className="h-4 w-4" />
+          {t('listAnItem')}
+        </Link>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="flex border-b border-gray-200">
+            {tabItems.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium border-b-2 -mb-px transition ${
+                  activeTab === tab.key ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
               >
-                <div className="aspect-[4/5] bg-gray-100 relative overflow-hidden">
-                  {item.images?.[0] ? (
-                    <img
-                      src={item.images[0]}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <Package className="h-8 w-8" />
-                    </div>
-                  )}
-                  {item.status === 'sold' && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">{t('sold')}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  <p className="text-sm font-bold text-gray-900">
-                    {(item.price / 100).toFixed(2)} <span className="text-xs font-normal text-gray-500">{item.currency || 'RON'}</span>
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{item.title}</p>
-                </div>
-              </Link>
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+                {tab.count > 0 && <span className="text-xs text-gray-400">({tab.count})</span>}
+              </button>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            {activeTab === 'selling' ? (
-              <>
-                <Package className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-900 font-medium mb-1">{t('startSellingCTA')}</p>
-                <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
-                  {t('startSellingDescription')}
-                </p>
-                <Link
-                  href="/app/sell"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-500 text-white text-sm font-medium rounded-full hover:bg-teal-600 transition"
-                >
-                  <Plus className="h-4 w-4" />
-                  {t('listAnItem')}
-                </Link>
-              </>
+
+          <div className="p-4">
+            {activeItems.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {activeItems.map((item) => (
+                  <Link key={item.id} href={`/item/${item.id}`} className="group">
+                    <div className="aspect-[3/4] bg-gray-100 rounded-xl relative overflow-hidden">
+                      {item.images?.[0] ? (
+                        <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-300"><Package className="h-8 w-8" /></div>
+                      )}
+                      {item.status === 'sold' && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><span className="text-white text-sm font-semibold">{t('sold')}</span></div>
+                      )}
+                      {item.status === 'draft' && (
+                        <span className="absolute top-2 left-2 text-[10px] font-medium bg-gray-800 text-white px-1.5 py-0.5 rounded">Draft</span>
+                      )}
+                    </div>
+                    <div className="mt-1.5 px-0.5">
+                      <p className="text-sm font-bold text-gray-900">{(item.price / 100).toFixed(2)} <span className="text-xs font-normal text-gray-500">{item.currency || 'RON'}</span></p>
+                      <p className="text-xs text-gray-500 truncate">{item.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-400">
+                        <span>{item.views_count || 0} views</span>
+                        <span>{item.favorites_count || 0} fav</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             ) : (
-              <>
-                <Heart className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-sm text-gray-500">{t('noLikes')}</p>
-              </>
+              <div className="text-center py-12">
+                {activeTab === 'selling' ? (
+                  <>
+                    <Package className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+                    <p className="text-gray-900 font-medium mb-1">{t('startSellingCTA')}</p>
+                    <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">{t('startSellingDescription')}</p>
+                    <Link href="/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition">
+                      <Plus className="h-4 w-4" />
+                      {t('listAnItem')}
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Heart className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+                    <p className="text-sm text-gray-500">{t('noLikes')}</p>
+                  </>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Reviews Section */}
-      <div className="border-t border-gray-200 pt-6 mt-2">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">{t('reviewsTitle')}</h2>
-        {(profile?.rating_count ?? 0) > 0 ? (
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`h-5 w-5 ${star <= Math.round(profile?.rating_avg || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
-                />
-              ))}
+        {/* Reviews */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mt-6">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">{t('reviewsTitle')}</h2>
+          {(profile?.rating_count ?? 0) > 0 ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star key={star} className={`h-4 w-4 ${star <= Math.round(profile?.rating_avg || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`} />
+                ))}
+              </div>
+              <span className="text-sm text-gray-600">{profile?.rating_avg?.toFixed(1)} ({profile?.rating_count} {t('reviews')})</span>
             </div>
-            <span className="text-sm text-gray-600">
-              {profile?.rating_avg?.toFixed(1)} ({profile?.rating_count} {t('reviews')})
-            </span>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-500">{t('noReviews')}</p>
-        )}
-      </div>
+          ) : (
+            <p className="text-sm text-gray-500">{t('noReviews')}</p>
+          )}
+        </div>
 
-      {/* Logout */}
-      <div className="border-t border-gray-200 pt-6 mt-6 pb-8">
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="inline-flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition"
-          >
-            <LogOut className="h-4 w-4" />
-            {t('logout')}
-          </button>
-        </form>
+        {/* Logout */}
+        <div className="mt-6 pb-8">
+          <form action={signOut}>
+            <button type="submit" className="inline-flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition">
+              <LogOut className="h-4 w-4" />
+              {t('logout')}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

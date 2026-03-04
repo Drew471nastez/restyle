@@ -3,19 +3,9 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { createListing } from '@/actions/listings';
 import { CATEGORIES, CONDITIONS, SIZES } from '@/lib/constants';
+import { Camera, X, Upload, Loader2 } from 'lucide-react';
 
 export default function SellPage() {
   const t = useTranslations('sell');
@@ -30,8 +20,6 @@ export default function SellPage() {
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
-
-    // Placeholder: in production, upload to Supabase Storage and get URLs
     const newImages: string[] = [];
     for (let i = 0; i < files.length; i++) {
       newImages.push(URL.createObjectURL(files[i]));
@@ -62,179 +50,186 @@ export default function SellPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-2xl px-4 py-8">
+        <h1 className="text-xl font-bold text-gray-900 mb-1">{t('title')}</h1>
+        <p className="text-sm text-gray-500 mb-6">Fill in the details to list your item</p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Images */}
-        <div>
-          <Label>{t('images')}</Label>
-          <p className="mb-2 text-xs text-gray-500">{t('imagesDescription')}</p>
-          <div className="flex flex-wrap gap-3">
-            {images.map((src, i) => (
-              <div key={i} className="relative h-24 w-24 overflow-hidden rounded-lg border border-gray-200">
-                <img src={src} alt="" className="h-full w-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(i)}
-                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-xs text-white hover:bg-black/70"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Photos section */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h2 className="text-sm font-semibold text-gray-900 mb-1">Photos</h2>
+            <p className="text-xs text-gray-500 mb-4">Add up to 5 photos. The first one will be the cover.</p>
+            <div className="flex flex-wrap gap-3">
+              {images.map((src, i) => (
+                <div key={i} className="relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-xl border border-gray-200">
+                  <img src={src} alt="" className="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  {i === 0 && (
+                    <span className="absolute bottom-1 left-1 text-[10px] font-medium bg-teal-500 text-white px-1.5 py-0.5 rounded">
+                      Cover
+                    </span>
+                  )}
+                </div>
+              ))}
+              {images.length < 5 && (
+                <label className="flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-teal-500 hover:text-teal-500">
+                  <Camera className="h-6 w-6" />
+                  <span className="text-[10px] font-medium">Add photo</span>
+                  <input type="file" accept="image/*" multiple onChange={handleImageChange} className="hidden" />
+                </label>
+              )}
+            </div>
+          </div>
+
+          {/* Details section */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-900">Details</h2>
+
+            <div>
+              <label htmlFor="title" className="block text-sm text-gray-700 mb-1">{t('listingTitle')}</label>
+              <input
+                id="title"
+                name="title"
+                placeholder={t('titlePlaceholder')}
+                required
+                maxLength={100}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm text-gray-700 mb-1">{t('description')}</label>
+              <textarea
+                id="description"
+                name="description"
+                placeholder={t('descriptionPlaceholder')}
+                required
+                rows={4}
+                maxLength={1000}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="brand" className="block text-sm text-gray-700 mb-1">{t('brand')}</label>
+              <input
+                id="brand"
+                name="brand"
+                placeholder={t('brandPlaceholder')}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Category & attributes */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-900">Category & attributes</h2>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">{t('category')}</label>
+                <select
+                  name="category"
+                  required
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
                 >
-                  x
-                </button>
+                  <option value="">{t('selectCategory')}</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat.slug} value={cat.slug}>{cat.label}</option>
+                  ))}
+                </select>
               </div>
-            ))}
-            {images.length < 5 && (
-              <label className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-green-500 hover:text-green-500">
-                <span className="text-2xl">+</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
-            )}
+
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">{t('subcategory')}</label>
+                <select
+                  name="subcategory"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                >
+                  <option value="">{t('selectSubcategory')}</option>
+                  {currentCategory?.subcategories.map((sub) => (
+                    <option key={sub} value={sub}>{sub.charAt(0).toUpperCase() + sub.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">{t('size')}</label>
+                <select
+                  name="size"
+                  required
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                >
+                  <option value="">{t('selectSize')}</option>
+                  {SIZES.clothing.map((size) => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">{t('condition')}</label>
+                <select
+                  name="condition"
+                  required
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none bg-white"
+                >
+                  <option value="">{t('selectCondition')}</option>
+                  {CONDITIONS.map((cond) => (
+                    <option key={cond.value} value={cond.value}>{cond.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Title */}
-        <div className="space-y-2">
-          <Label htmlFor="title">{t('listingTitle')}</Label>
-          <Input
-            id="title"
-            name="title"
-            placeholder={t('titlePlaceholder')}
-            required
-            maxLength={100}
-          />
-        </div>
+          {/* Price */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h2 className="text-sm font-semibold text-gray-900 mb-3">Price</h2>
+            <div className="relative max-w-xs">
+              <input
+                name="price"
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                required
+                className="w-full rounded-lg border border-gray-200 pl-14 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+              />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">RON</span>
+            </div>
+          </div>
 
-        {/* Description */}
-        <div className="space-y-2">
-          <Label htmlFor="description">{t('description')}</Label>
-          <Textarea
-            id="description"
-            name="description"
-            placeholder={t('descriptionPlaceholder')}
-            required
-            rows={4}
-            maxLength={1000}
-          />
-        </div>
+          {error && (
+            <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-600">{error}</div>
+          )}
 
-        {/* Brand */}
-        <div className="space-y-2">
-          <Label htmlFor="brand">{t('brand')}</Label>
-          <Input
-            id="brand"
-            name="brand"
-            placeholder={t('brandPlaceholder')}
-          />
-        </div>
-
-        {/* Category & Subcategory */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label>{t('category')}</Label>
-            <Select
-              name="category"
-              required
-              onValueChange={setSelectedCategory}
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-teal-500 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <SelectTrigger>
-                <SelectValue placeholder={t('selectCategory')} />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat.slug} value={cat.slug}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {loading ? t('publishing') : t('publish')}
+            </button>
           </div>
-
-          <div className="space-y-2">
-            <Label>{t('subcategory')}</Label>
-            <Select name="subcategory">
-              <SelectTrigger>
-                <SelectValue placeholder={t('selectSubcategory')} />
-              </SelectTrigger>
-              <SelectContent>
-                {currentCategory?.subcategories.map((sub) => (
-                  <SelectItem key={sub} value={sub}>
-                    {sub.charAt(0).toUpperCase() + sub.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Size & Condition */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label>{t('size')}</Label>
-            <Select name="size" required>
-              <SelectTrigger>
-                <SelectValue placeholder={t('selectSize')} />
-              </SelectTrigger>
-              <SelectContent>
-                {SIZES.clothing.map((size) => (
-                  <SelectItem key={size} value={size}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t('condition')}</Label>
-            <Select name="condition" required>
-              <SelectTrigger>
-                <SelectValue placeholder={t('selectCondition')} />
-              </SelectTrigger>
-              <SelectContent>
-                {CONDITIONS.map((cond) => (
-                  <SelectItem key={cond.value} value={cond.value}>
-                    {cond.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Price */}
-        <div className="space-y-2">
-          <Label htmlFor="price">{t('price')}</Label>
-          <div className="relative">
-            <Input
-              id="price"
-              name="price"
-              type="number"
-              step="0.01"
-              min="0.01"
-              placeholder="0.00"
-              required
-              className="pl-12"
-            />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-              RON
-            </span>
-          </div>
-        </div>
-
-        {error && (
-          <p className="text-sm text-red-600">{error}</p>
-        )}
-
-        <Button type="submit" className="w-full" size="lg" disabled={loading}>
-          {loading ? t('publishing') : t('publish')}
-        </Button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
