@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   display_name TEXT,
   avatar_url TEXT,
   bio TEXT,
-  country_code TEXT DEFAULT 'RO',
+  country TEXT DEFAULT 'RO',
   city TEXT,
   phone TEXT,
   is_verified BOOLEAN DEFAULT false,
@@ -73,13 +73,12 @@ CREATE TABLE IF NOT EXISTS public.listings (
   title TEXT NOT NULL,
   description TEXT,
   category TEXT NOT NULL,
+  subcategory TEXT,
   brand TEXT,
   size TEXT NOT NULL,
   condition TEXT NOT NULL CHECK (condition IN ('new_with_tags','like_new','good','fair')),
-  color TEXT,
-  price_cents INTEGER NOT NULL,
+  price INTEGER NOT NULL,
   currency TEXT DEFAULT 'RON',
-  cover_image_url TEXT,
   images TEXT[] NOT NULL DEFAULT '{}',
   is_boosted BOOLEAN DEFAULT false,
   is_featured BOOLEAN DEFAULT false,
@@ -94,7 +93,7 @@ CREATE TABLE IF NOT EXISTS public.listings (
 CREATE INDEX IF NOT EXISTS idx_listings_seller ON public.listings(seller_id);
 CREATE INDEX IF NOT EXISTS idx_listings_status ON public.listings(status);
 CREATE INDEX IF NOT EXISTS idx_listings_category ON public.listings(category);
-CREATE INDEX IF NOT EXISTS idx_listings_price ON public.listings(price_cents);
+CREATE INDEX IF NOT EXISTS idx_listings_price ON public.listings(price);
 CREATE INDEX IF NOT EXISTS idx_listings_created ON public.listings(created_at DESC);
 
 -- Full-text search
@@ -115,7 +114,7 @@ CREATE TRIGGER listings_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
 -- ============================================================
--- C) LISTING_IMAGES
+-- C) LISTING_IMAGES (optional separate image table)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.listing_images (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -145,43 +144,46 @@ CREATE INDEX IF NOT EXISTS idx_favorites_listing ON public.favorites(listing_id)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.follows (
   follower_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  followed_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  following_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT now(),
-  PRIMARY KEY (follower_id, followed_id)
+  PRIMARY KEY (follower_id, following_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_follows_follower ON public.follows(follower_id);
-CREATE INDEX IF NOT EXISTS idx_follows_followed ON public.follows(followed_id);
+CREATE INDEX IF NOT EXISTS idx_follows_following ON public.follows(following_id);
 
 -- ============================================================
--- F) MESSAGE_THREADS
+-- F) CONVERSATIONS
 -- ============================================================
-CREATE TABLE IF NOT EXISTS public.message_threads (
+CREATE TABLE IF NOT EXISTS public.conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  participant_1 UUID NOT NULL REFERENCES public.profiles(id),
+  participant_2 UUID NOT NULL REFERENCES public.profiles(id),
   listing_id UUID REFERENCES public.listings(id),
-  buyer_id UUID NOT NULL REFERENCES public.profiles(id),
-  seller_id UUID NOT NULL REFERENCES public.profiles(id),
   last_message_at TIMESTAMPTZ DEFAULT now(),
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_threads_buyer ON public.message_threads(buyer_id);
-CREATE INDEX IF NOT EXISTS idx_threads_seller ON public.message_threads(seller_id);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_threads_unique ON public.message_threads(buyer_id, seller_id, listing_id) WHERE listing_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_conversations_p1 ON public.conversations(participant_1);
+CREATE INDEX IF NOT EXISTS idx_conversations_p2 ON public.conversations(participant_2);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_conversations_unique ON public.conversations(participant_1, participant_2, listing_id) WHERE listing_id IS NOT NULL;
 
 -- ============================================================
 -- G) MESSAGES
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  thread_id UUID NOT NULL REFERENCES public.message_threads(id) ON DELETE CASCADE,
+  conversation_id UUID NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
   sender_id UUID NOT NULL REFERENCES public.profiles(id),
-  body TEXT NOT NULL,
+  content TEXT NOT NULL,
+  message_type TEXT DEFAULT 'text',
+  offer_amount INTEGER,
+  offer_status TEXT,
   is_read BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_messages_thread ON public.messages(thread_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON public.messages(conversation_id, created_at DESC);
 
 -- ============================================================
 -- H) OFFERS
@@ -217,19 +219,19 @@ CREATE TABLE IF NOT EXISTS public.orders (
   status TEXT DEFAULT 'created' CHECK (status IN (
     'created','paid','label_ready','shipped','delivered','completed','disputed','refunded','cancelled'
   )),
-  item_amount_cents INTEGER NOT NULL,
-  shipping_amount_cents INTEGER NOT NULL DEFAULT 0,
-  buyer_fee_cents INTEGER NOT NULL DEFAULT 0,
-  platform_fee_cents INTEGER NOT NULL DEFAULT 0,
-  total_amount_cents INTEGER NOT NULL,
+  total_amount INTEGER NOT NULL,
+  item_price INTEGER NOT NULL,
+  shipping_cost INTEGER NOT NULL DEFAULT 0,
+  platform_fee INTEGER NOT NULL DEFAULT 0,
   currency TEXT DEFAULT 'RON',
-  payment_provider TEXT DEFAULT 'stripe',
-  payment_intent_id TEXT,
-  shipping_provider TEXT,
+  stripe_payment_intent_id TEXT,
+  shipping_label_url TEXT,
   tracking_number TEXT,
-  label_url TEXT,
-  delivery_confirmed_at TIMESTAMPTZ,
-  completion_eligible_at TIMESTAMPTZ,
+  shipping_provider TEXT,
+  shipped_at TIMESTAMPTZ,
+  delivered_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  dispute_reason TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -245,58 +247,74 @@ CREATE TRIGGER orders_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
 -- ============================================================
--- J) WALLET_BALANCES
+-- J) ORDER_ITEMS
 -- ============================================================
-CREATE TABLE IF NOT EXISTS public.wallet_balances (
-  user_id UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
-  available_cents INTEGER DEFAULT 0,
-  pending_cents INTEGER DEFAULT 0,
+CREATE TABLE IF NOT EXISTS public.order_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  listing_id UUID NOT NULL REFERENCES public.listings(id),
+  price INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON public.order_items(order_id);
+
+-- ============================================================
+-- K) WALLETS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.wallets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID UNIQUE NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  available_balance INTEGER DEFAULT 0,
+  pending_balance INTEGER DEFAULT 0,
+  total_earned INTEGER DEFAULT 0,
   currency TEXT DEFAULT 'RON',
+  iban TEXT,
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ============================================================
--- K) WALLET_TRANSACTIONS
+-- L) TRANSACTIONS
 -- ============================================================
-CREATE TABLE IF NOT EXISTS public.wallet_transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.profiles(id),
-  type TEXT NOT NULL CHECK (type IN ('credit','debit')),
-  reason TEXT NOT NULL CHECK (reason IN ('sale','refund','payout','fee_adjustment','subscription')),
-  amount_cents INTEGER NOT NULL,
-  currency TEXT DEFAULT 'RON',
+  wallet_id UUID NOT NULL REFERENCES public.wallets(id),
   order_id UUID REFERENCES public.orders(id),
+  type TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  status TEXT DEFAULT 'pending',
   stripe_transfer_id TEXT,
   description TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_wallet_tx_user ON public.wallet_transactions(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_wallet ON public.transactions(wallet_id, created_at DESC);
 
 -- ============================================================
--- L) REVIEWS
+-- M) REVIEWS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES public.orders(id),
   reviewer_id UUID NOT NULL REFERENCES public.profiles(id),
-  reviewee_id UUID NOT NULL REFERENCES public.profiles(id),
+  reviewed_id UUID NOT NULL REFERENCES public.profiles(id),
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  text TEXT,
+  comment TEXT,
+  review_type TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(order_id, reviewer_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_reviews_reviewee ON public.reviews(reviewee_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewed ON public.reviews(reviewed_id);
 
 -- Trigger to update profile rating on new review
 CREATE OR REPLACE FUNCTION public.update_profile_rating()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE public.profiles SET
-    rating_avg = (SELECT COALESCE(AVG(rating), 0) FROM public.reviews WHERE reviewee_id = NEW.reviewee_id),
-    rating_count = (SELECT COUNT(*) FROM public.reviews WHERE reviewee_id = NEW.reviewee_id)
-  WHERE id = NEW.reviewee_id;
+    rating_avg = (SELECT COALESCE(AVG(rating), 0) FROM public.reviews WHERE reviewed_id = NEW.reviewed_id),
+    rating_count = (SELECT COUNT(*) FROM public.reviews WHERE reviewed_id = NEW.reviewed_id)
+  WHERE id = NEW.reviewed_id;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -307,7 +325,7 @@ CREATE TRIGGER on_review_created
   FOR EACH ROW EXECUTE FUNCTION public.update_profile_rating();
 
 -- ============================================================
--- M) DISPUTES
+-- N) DISPUTES
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.disputes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -326,15 +344,16 @@ CREATE INDEX IF NOT EXISTS idx_disputes_order ON public.disputes(order_id);
 CREATE INDEX IF NOT EXISTS idx_disputes_status ON public.disputes(status);
 
 -- ============================================================
--- N) SUBSCRIPTIONS
+-- O) SUBSCRIPTIONS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID UNIQUE NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  plan TEXT DEFAULT 'pro' CHECK (plan IN ('pro')),
-  status TEXT NOT NULL CHECK (status IN ('active','cancelled','past_due','trialing')),
   stripe_subscription_id TEXT,
   stripe_customer_id TEXT,
+  plan TEXT DEFAULT 'pro' CHECK (plan IN ('pro')),
+  status TEXT NOT NULL CHECK (status IN ('active','cancelled','past_due','trialing')),
+  current_period_start TIMESTAMPTZ,
   current_period_end TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -382,12 +401,13 @@ ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.listing_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.follows ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.message_threads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.wallet_balances ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wallets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disputes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
@@ -438,27 +458,27 @@ CREATE POLICY "follows_insert" ON public.follows FOR INSERT WITH CHECK (auth.uid
 DROP POLICY IF EXISTS "follows_delete" ON public.follows;
 CREATE POLICY "follows_delete" ON public.follows FOR DELETE USING (auth.uid() = follower_id);
 
--- MESSAGE_THREADS: participants only
-DROP POLICY IF EXISTS "threads_select" ON public.message_threads;
-CREATE POLICY "threads_select" ON public.message_threads FOR SELECT
-  USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
-DROP POLICY IF EXISTS "threads_insert" ON public.message_threads;
-CREATE POLICY "threads_insert" ON public.message_threads FOR INSERT
-  WITH CHECK (auth.uid() = buyer_id OR auth.uid() = seller_id);
+-- CONVERSATIONS: participants only
+DROP POLICY IF EXISTS "conversations_select" ON public.conversations;
+CREATE POLICY "conversations_select" ON public.conversations FOR SELECT
+  USING (auth.uid() = participant_1 OR auth.uid() = participant_2);
+DROP POLICY IF EXISTS "conversations_insert" ON public.conversations;
+CREATE POLICY "conversations_insert" ON public.conversations FOR INSERT
+  WITH CHECK (auth.uid() = participant_1 OR auth.uid() = participant_2);
 
--- MESSAGES: thread participants only
+-- MESSAGES: conversation participants only
 DROP POLICY IF EXISTS "messages_select" ON public.messages;
 CREATE POLICY "messages_select" ON public.messages FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.message_threads t WHERE t.id = thread_id AND (t.buyer_id = auth.uid() OR t.seller_id = auth.uid()))
+  EXISTS (SELECT 1 FROM public.conversations c WHERE c.id = conversation_id AND (c.participant_1 = auth.uid() OR c.participant_2 = auth.uid()))
 );
 DROP POLICY IF EXISTS "messages_insert" ON public.messages;
 CREATE POLICY "messages_insert" ON public.messages FOR INSERT WITH CHECK (
   auth.uid() = sender_id AND
-  EXISTS (SELECT 1 FROM public.message_threads t WHERE t.id = thread_id AND (t.buyer_id = auth.uid() OR t.seller_id = auth.uid()))
+  EXISTS (SELECT 1 FROM public.conversations c WHERE c.id = conversation_id AND (c.participant_1 = auth.uid() OR c.participant_2 = auth.uid()))
 );
 DROP POLICY IF EXISTS "messages_update" ON public.messages;
 CREATE POLICY "messages_update" ON public.messages FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM public.message_threads t WHERE t.id = thread_id AND (t.buyer_id = auth.uid() OR t.seller_id = auth.uid()))
+  EXISTS (SELECT 1 FROM public.conversations c WHERE c.id = conversation_id AND (c.participant_1 = auth.uid() OR c.participant_2 = auth.uid()))
 );
 
 -- OFFERS: participants only
@@ -483,13 +503,25 @@ DROP POLICY IF EXISTS "orders_update" ON public.orders;
 CREATE POLICY "orders_update" ON public.orders FOR UPDATE
   USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
 
--- WALLET: owner only
-DROP POLICY IF EXISTS "wallet_select" ON public.wallet_balances;
-CREATE POLICY "wallet_select" ON public.wallet_balances FOR SELECT USING (auth.uid() = user_id);
+-- ORDER_ITEMS: same as orders via join
+DROP POLICY IF EXISTS "order_items_select" ON public.order_items;
+CREATE POLICY "order_items_select" ON public.order_items FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.orders o WHERE o.id = order_id AND (o.buyer_id = auth.uid() OR o.seller_id = auth.uid()))
+);
+DROP POLICY IF EXISTS "order_items_insert" ON public.order_items;
+CREATE POLICY "order_items_insert" ON public.order_items FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.orders o WHERE o.id = order_id AND o.buyer_id = auth.uid())
+);
 
--- WALLET_TRANSACTIONS: owner only
-DROP POLICY IF EXISTS "wallet_tx_select" ON public.wallet_transactions;
-CREATE POLICY "wallet_tx_select" ON public.wallet_transactions FOR SELECT USING (auth.uid() = user_id);
+-- WALLETS: owner only
+DROP POLICY IF EXISTS "wallets_select" ON public.wallets;
+CREATE POLICY "wallets_select" ON public.wallets FOR SELECT USING (auth.uid() = user_id);
+
+-- TRANSACTIONS: wallet owner only
+DROP POLICY IF EXISTS "transactions_select" ON public.transactions;
+CREATE POLICY "transactions_select" ON public.transactions FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.wallets w WHERE w.id = wallet_id AND w.user_id = auth.uid())
+);
 
 -- REVIEWS: public read, order participant create
 DROP POLICY IF EXISTS "reviews_select" ON public.reviews;
@@ -509,3 +541,37 @@ CREATE POLICY "disputes_insert" ON public.disputes FOR INSERT WITH CHECK (auth.u
 -- SUBSCRIPTIONS: owner only
 DROP POLICY IF EXISTS "subscriptions_select" ON public.subscriptions;
 CREATE POLICY "subscriptions_select" ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
+
+-- ============================================================
+-- STORAGE BUCKETS
+-- ============================================================
+INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true) ON CONFLICT DO NOTHING;
+INSERT INTO storage.buckets (id, name, public) VALUES ('listings', 'listings', true) ON CONFLICT DO NOTHING;
+
+-- Storage policies for avatars
+DROP POLICY IF EXISTS "avatar_select" ON storage.objects;
+CREATE POLICY "avatar_select" ON storage.objects FOR SELECT
+  USING (bucket_id = 'avatars');
+DROP POLICY IF EXISTS "avatar_insert" ON storage.objects;
+CREATE POLICY "avatar_insert" ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'avatars' AND auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "avatar_update" ON storage.objects;
+CREATE POLICY "avatar_update" ON storage.objects FOR UPDATE
+  USING (bucket_id = 'avatars' AND auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "avatar_delete" ON storage.objects;
+CREATE POLICY "avatar_delete" ON storage.objects FOR DELETE
+  USING (bucket_id = 'avatars' AND auth.uid() IS NOT NULL);
+
+-- Storage policies for listing images
+DROP POLICY IF EXISTS "listing_img_select" ON storage.objects;
+CREATE POLICY "listing_img_select" ON storage.objects FOR SELECT
+  USING (bucket_id = 'listings');
+DROP POLICY IF EXISTS "listing_img_insert" ON storage.objects;
+CREATE POLICY "listing_img_insert" ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'listings' AND auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "listing_img_update" ON storage.objects;
+CREATE POLICY "listing_img_update" ON storage.objects FOR UPDATE
+  USING (bucket_id = 'listings' AND auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "listing_img_delete" ON storage.objects;
+CREATE POLICY "listing_img_delete" ON storage.objects FOR DELETE
+  USING (bucket_id = 'listings' AND auth.uid() IS NOT NULL);

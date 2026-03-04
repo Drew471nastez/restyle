@@ -491,5 +491,10 @@
     "cookiesTitle": "Cookie-uri \u0219i urm\u0103rire",
     "yourRightsTitle": "Drepturile tale",
     "contactTitle": "Contacteaz\u0103-ne"
+  },
+  "countrySelector": {
+    "title": "Unde locuie\u0219ti?",
+    "subtitle": "Selecteaz\u0103 \u021bara ta pentru a vedea articole relevante",
+    "confirm": "Continu\u0103"
   }
 }

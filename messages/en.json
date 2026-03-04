@@ -491,5 +491,10 @@
     "cookiesTitle": "Cookies & Tracking",
     "yourRightsTitle": "Your Rights",
     "contactTitle": "Contact Us"
+  },
+  "countrySelector": {
+    "title": "Where do you live?",
+    "subtitle": "Select your country to see relevant items near you",
+    "confirm": "Continue"
   }
 }
