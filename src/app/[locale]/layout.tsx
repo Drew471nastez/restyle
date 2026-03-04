@@ -1,8 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { MobileNav } from '@/components/layout/MobileNav';
+import { PublicHeader } from '@/components/layout/PublicHeader';
+import { PublicFooter } from '@/components/layout/PublicFooter';
 
 export default async function LocaleLayout({
   children,
@@ -13,12 +12,9 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <Navbar />
-      <main className="flex-1 pb-16 md:pb-0">
-        {children}
-      </main>
-      <Footer />
-      <MobileNav />
+      <PublicHeader />
+      <main className="flex-1">{children}</main>
+      <PublicFooter />
     </NextIntlClientProvider>
   );
 }
