@@ -55,7 +55,7 @@ export default async function FavoritesPage() {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1440px] px-4 lg:px-8 py-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
         <p className="mt-1 text-sm text-gray-500">

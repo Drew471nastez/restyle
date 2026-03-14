@@ -48,7 +48,7 @@ export default async function ListingsPage() {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1440px] px-4 lg:px-8 py-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
@@ -57,7 +57,7 @@ export default async function ListingsPage() {
           </p>
         </div>
         <Link
-          href="/app/sell"
+          href="/sell"
           className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
         >
           <Plus className="h-4 w-4" />
@@ -77,7 +77,7 @@ export default async function ListingsPage() {
             {t('emptyDescription')}
           </p>
           <Link
-            href="/app/sell"
+            href="/sell"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-600"
           >
             <Plus className="h-4 w-4" />
@@ -128,7 +128,7 @@ export default async function ListingsPage() {
 
                 <div className="mt-3 flex gap-2 border-t border-gray-100 pt-3">
                   <Link
-                    href={`/app/listings/${listing.id}/edit`}
+                    href={`/listings/${listing.id}/edit`}
                     className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
                   >
                     <Pencil className="h-3.5 w-3.5" />

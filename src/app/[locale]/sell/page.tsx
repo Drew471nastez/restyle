@@ -1,167 +1,245 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { createListing } from '@/actions/listings';
-import { CATEGORIES, CONDITIONS, SIZES } from '@/lib/constants';
-import { Camera, X, Upload, Loader2 } from 'lucide-react';
+import { CATEGORIES, CONDITIONS, SIZES, MAX_IMAGES_PER_LISTING } from '@/lib/constants';
+import { ImagePlus, X, Loader2 } from 'lucide-react';
 
 export default function SellPage() {
   const t = useTranslations('sell');
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [images, setImages] = useState<string[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [category, setCategory] = useState('');
+  const [subcategory, setSubcategory] = useState('');
+  const [sizeType, setSizeType] = useState<'clothing' | 'shoes_eu' | 'numeric'>('clothing');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const currentCategory = CATEGORIES.find((c) => c.slug === selectedCategory);
+  const selectedCategory = CATEGORIES.find((c) => c.slug === category);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const remaining = 5 - images.length;
+
+    const remaining = MAX_IMAGES_PER_LISTING - images.length;
     const toAdd = Array.from(files).slice(0, remaining);
+
     toAdd.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        setImages((prev) => [...prev, base64].slice(0, 5));
+        setPreviews((prev) => [...prev, base64]);
+        setImages((prev) => [...prev, base64]);
       };
       reader.readAsDataURL(file);
     });
-  }
 
-  function removeImage(index: number) {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    formData.set('images', JSON.stringify(images));
-
-    const result = await createListing(formData);
-
-    if (result?.error) {
-      setError(result.error);
-      setLoading(false);
-    } else if (result?.listing) {
-      router.push(`/item/${result.listing.id}`);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
-  }
+  };
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      formData.set('images', JSON.stringify(images));
+      formData.set('category', category);
+      formData.set('subcategory', subcategory);
+
+      const result = await createListing(formData);
+
+      if (result.error) {
+        setError(result.error);
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (result.listing) {
+        router.push(`/item/${result.listing.id}`);
+      } else {
+        router.push('/');
+      }
+    } catch {
+      setError(t('unexpectedError'));
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="text-xl font-bold text-gray-900 mb-1">{t('title')}</h1>
-        <p className="text-sm text-gray-500 mb-6">Fill in the details to list your item</p>
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('subtitle')}</p>
+        </div>
+
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Photos section */}
+          {/* Images Section */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-gray-900 mb-1">Photos</h2>
-            <p className="text-xs text-gray-500 mb-4">Add up to 5 photos. The first one will be the cover.</p>
+            <h2 className="text-sm font-semibold text-gray-900 mb-1">
+              {t('photos')}
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              {t('photosHint', { max: MAX_IMAGES_PER_LISTING })}
+            </p>
             <div className="flex flex-wrap gap-3">
-              {images.map((src, i) => (
-                <div key={i} className="relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-xl border border-gray-200">
-                  <img src={src} alt="" className="h-full w-full object-cover" />
+              {previews.map((preview, index) => (
+                <div
+                  key={index}
+                  className="relative h-24 w-24 overflow-hidden rounded-xl border border-gray-200 sm:h-28 sm:w-28"
+                >
+                  <img
+                    src={preview}
+                    alt={`Upload ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
                   <button
                     type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                    onClick={() => removeImage(index)}
+                    className="absolute right-1 top-1 rounded-full bg-black/50 p-1 text-white transition-colors hover:bg-black/70"
                   >
                     <X className="h-3 w-3" />
                   </button>
-                  {i === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[10px] font-medium bg-violet-500 text-white px-1.5 py-0.5 rounded">
-                      Cover
+                  {index === 0 && (
+                    <span className="absolute bottom-1 left-1 rounded bg-violet-500 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                      {t('cover')}
                     </span>
                   )}
                 </div>
               ))}
-              {images.length < 5 && (
-                <label className="flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-violet-500 hover:text-violet-500">
-                  <Camera className="h-6 w-6" />
-                  <span className="text-[10px] font-medium">Add photo</span>
-                  <input type="file" accept="image/*" multiple onChange={handleImageChange} className="hidden" />
-                </label>
+              {images.length < MAX_IMAGES_PER_LISTING && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex h-24 w-24 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-violet-400 hover:text-violet-500 sm:h-28 sm:w-28"
+                >
+                  <ImagePlus className="h-6 w-6" />
+                  <span className="mt-1 text-[10px]">{t('addPhoto')}</span>
+                </button>
               )}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+            />
           </div>
 
-          {/* Details section */}
+          {/* Details Section */}
           <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-            <h2 className="text-sm font-semibold text-gray-900">Details</h2>
-
+            <h2 className="text-sm font-semibold text-gray-900">
+              {t('details')}
+            </h2>
             <div>
-              <label htmlFor="title" className="block text-sm text-gray-700 mb-1">{t('listingTitle')}</label>
+              <label htmlFor="title" className="mb-1 block text-sm text-gray-700">
+                {t('itemTitle')}
+              </label>
               <input
                 id="title"
                 name="title"
-                placeholder={t('titlePlaceholder')}
+                type="text"
                 required
-                maxLength={100}
+                placeholder={t('titlePlaceholder')}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
               />
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm text-gray-700 mb-1">{t('description')}</label>
+              <label htmlFor="description" className="mb-1 block text-sm text-gray-700">
+                {t('description')}
+              </label>
               <textarea
                 id="description"
                 name="description"
-                placeholder={t('descriptionPlaceholder')}
-                required
                 rows={4}
-                maxLength={1000}
+                required
+                placeholder={t('descriptionPlaceholder')}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none resize-none"
               />
             </div>
 
             <div>
-              <label htmlFor="brand" className="block text-sm text-gray-700 mb-1">{t('brand')}</label>
+              <label htmlFor="brand" className="mb-1 block text-sm text-gray-700">
+                {t('brand')}
+              </label>
               <input
                 id="brand"
                 name="brand"
+                type="text"
                 placeholder={t('brandPlaceholder')}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
               />
             </div>
           </div>
 
-          {/* Category & attributes */}
+          {/* Category & Attributes Section */}
           <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-            <h2 className="text-sm font-semibold text-gray-900">Category & attributes</h2>
-
+            <h2 className="text-sm font-semibold text-gray-900">
+              {t('categoryAndAttributes')}
+            </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">{t('category')}</label>
+                <label htmlFor="category" className="mb-1 block text-sm text-gray-700">
+                  {t('category')}
+                </label>
                 <select
-                  name="category"
+                  id="category"
+                  value={category}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setSubcategory('');
+                  }}
                   required
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                 >
                   <option value="">{t('selectCategory')}</option>
                   {CATEGORIES.map((cat) => (
-                    <option key={cat.slug} value={cat.slug}>{cat.label}</option>
+                    <option key={cat.slug} value={cat.slug}>
+                      {cat.label}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-700 mb-1">{t('subcategory')}</label>
+                <label htmlFor="subcategory" className="mb-1 block text-sm text-gray-700">
+                  {t('subcategory')}
+                </label>
                 <select
-                  name="subcategory"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
+                  id="subcategory"
+                  value={subcategory}
+                  onChange={(e) => setSubcategory(e.target.value)}
+                  disabled={!selectedCategory}
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
                 >
                   <option value="">{t('selectSubcategory')}</option>
-                  {currentCategory?.subcategories.map((sub) => (
-                    <option key={sub} value={sub}>{sub.charAt(0).toUpperCase() + sub.slice(1)}</option>
+                  {selectedCategory?.subcategories.map((sub) => (
+                    <option key={sub} value={sub}>
+                      {sub.charAt(0).toUpperCase() + sub.slice(1)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -169,68 +247,101 @@ export default function SellPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">{t('size')}</label>
+                <label htmlFor="condition" className="mb-1 block text-sm text-gray-700">
+                  {t('condition')}
+                </label>
                 <select
-                  name="size"
+                  id="condition"
+                  name="condition"
                   required
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                 >
-                  <option value="">{t('selectSize')}</option>
-                  {SIZES.clothing.map((size) => (
-                    <option key={size} value={size}>{size}</option>
+                  <option value="">{t('selectCondition')}</option>
+                  {CONDITIONS.map((cond) => (
+                    <option key={cond.value} value={cond.value}>
+                      {cond.label}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-700 mb-1">{t('condition')}</label>
+                <label className="mb-1 block text-sm text-gray-700">
+                  {t('sizeType')}
+                </label>
                 <select
-                  name="condition"
-                  required
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none bg-white"
+                  value={sizeType}
+                  onChange={(e) =>
+                    setSizeType(e.target.value as 'clothing' | 'shoes_eu' | 'numeric')
+                  }
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
                 >
-                  <option value="">{t('selectCondition')}</option>
-                  {CONDITIONS.map((cond) => (
-                    <option key={cond.value} value={cond.value}>{cond.label}</option>
-                  ))}
+                  <option value="clothing">{t('clothingSizes')}</option>
+                  <option value="shoes_eu">{t('shoeSizes')}</option>
+                  <option value="numeric">{t('numericSizes')}</option>
                 </select>
               </div>
             </div>
-          </div>
 
-          {/* Price */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Price</h2>
-            <div className="relative max-w-xs">
-              <input
-                name="price"
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder="0.00"
+            <div>
+              <label htmlFor="size" className="mb-1 block text-sm text-gray-700">
+                {t('size')}
+              </label>
+              <select
+                id="size"
+                name="size"
                 required
-                className="w-full rounded-lg border border-gray-200 pl-14 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
-              />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">RON</span>
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
+              >
+                <option value="">{t('selectSize')}</option>
+                {SIZES[sizeType].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {error && (
-            <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-600">{error}</div>
-          )}
+          {/* Price Section */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h2 className="text-sm font-semibold text-gray-900 mb-3">
+              {t('pricing')}
+            </h2>
+            <div className="relative max-w-xs">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">
+                RON
+              </span>
+              <input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                min="1"
+                required
+                placeholder="0.00"
+                className="w-full rounded-lg border border-gray-200 pl-14 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none"
+              />
+            </div>
+            <p className="mt-1.5 text-xs text-gray-500">{t('priceHint')}</p>
+          </div>
 
-          <div className="flex gap-3">
+          {/* Submit */}
+          <div className="flex gap-3 pb-8">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 sm:flex-none sm:px-8"
+            >
+              {t('cancel')}
+            </button>
             <button
               type="submit"
-              disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-violet-500 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={isSubmitting || images.length === 0}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-8"
             >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Upload className="h-4 w-4" />
-              )}
-              {loading ? t('publishing') : t('publish')}
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isSubmitting ? t('publishing') : t('publish')}
             </button>
           </div>
         </form>

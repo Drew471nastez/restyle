@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -50,7 +50,7 @@ interface ListingItem {
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -66,16 +66,20 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadProfile() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user || cancelled) return;
 
         const { data } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
+
+        if (cancelled) return;
 
         if (data) {
           setProfile(data);
@@ -88,13 +92,13 @@ export default function ProfilePage() {
           .select('id, title, price, currency, images, status, views_count, favorites_count')
           .eq('seller_id', user.id)
           .order('created_at', { ascending: false });
-        if (listingsData) setListings(listingsData);
+        if (!cancelled && listingsData) setListings(listingsData);
 
         const { data: favsData } = await supabase
           .from('favorites')
           .select('listing_id, listings(id, title, price, currency, images, status, views_count, favorites_count)')
           .eq('user_id', user.id);
-        if (favsData) {
+        if (!cancelled && favsData) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           setFavorites(favsData.map((f: any) => f.listings).filter(Boolean));
         }
@@ -103,26 +107,22 @@ export default function ProfilePage() {
           .from('follows')
           .select('*', { count: 'exact', head: true })
           .eq('following_id', user.id);
-        setFollowerCount(followers || 0);
+        if (!cancelled) setFollowerCount(followers || 0);
 
         const { count: following } = await supabase
           .from('follows')
           .select('*', { count: 'exact', head: true })
           .eq('follower_id', user.id);
-        setFollowingCount(following || 0);
-
-        await supabase
-          .from('profiles')
-          .update({ last_active_at: new Date().toISOString() })
-          .eq('id', user.id);
+        if (!cancelled) setFollowingCount(following || 0);
       } catch {
         // silently fail
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
 
     loadProfile();
+    return () => { cancelled = true; };
   }, [supabase]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,8 +183,41 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          {/* Profile skeleton */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+            <div className="flex items-start gap-5">
+              <div className="h-20 w-20 rounded-full bg-gray-200 animate-pulse shrink-0" />
+              <div className="flex-1 space-y-3">
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 w-48 bg-gray-100 rounded animate-pulse" />
+              </div>
+            </div>
+          </div>
+          <div className="h-11 bg-gray-200 rounded-xl animate-pulse mb-6" />
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex border-b border-gray-200 mb-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex-1 py-3 flex justify-center">
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i}>
+                  <div className="aspect-[3/4] bg-gray-200 rounded-xl animate-pulse" />
+                  <div className="mt-2 space-y-1">
+                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -247,7 +280,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Edit button - hidden on small screens, shown as full row below */}
             <button
               onClick={() => setIsEditing(!isEditing)}
               className="hidden sm:flex shrink-0 items-center gap-1.5 h-9 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
@@ -257,7 +289,6 @@ export default function ProfilePage() {
             </button>
           </div>
 
-          {/* Mobile edit button */}
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="sm:hidden flex items-center justify-center gap-1.5 w-full mt-4 h-9 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
@@ -266,7 +297,6 @@ export default function ProfilePage() {
             {t('editProfile')}
           </button>
 
-          {/* Bio / edit section */}
           {isEditing ? (
             <div className="mt-5 pt-5 border-t border-gray-100 space-y-3">
               <input
@@ -308,7 +338,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Sell CTA */}
-        <Link href="/app/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition mb-6">
+        <Link href="/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition mb-6">
           <Plus className="h-4 w-4" />
           {t('listAnItem')}
         </Link>
@@ -367,7 +397,7 @@ export default function ProfilePage() {
                     <Package className="h-12 w-12 text-gray-200 mx-auto mb-4" />
                     <p className="text-gray-900 font-medium mb-1">{t('startSellingCTA')}</p>
                     <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">{t('startSellingDescription')}</p>
-                    <Link href="/app/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition">
+                    <Link href="/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition">
                       <Plus className="h-4 w-4" />
                       {t('listAnItem')}
                     </Link>

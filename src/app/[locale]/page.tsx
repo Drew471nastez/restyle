@@ -23,7 +23,7 @@ const PAGE_SIZE = 24;
 
 export default function HomePage() {
   const t = useTranslations();
-  const { user, loading: userLoading } = useUser();
+  const { user } = useUser();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -92,8 +92,8 @@ export default function HomePage() {
     { slug: 'accessories', label: t('categories.accessories'), emoji: '💍', color: 'from-cyan-400 to-sky-500' },
   ];
 
-  // Loading skeleton
-  if (userLoading || loadingListings) {
+  // Loading skeleton - only wait for listings, not user auth
+  if (loadingListings) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-[1440px] px-4 lg:px-8 py-8">
@@ -166,7 +166,7 @@ export default function HomePage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
               <p className="text-gray-500 mb-6 text-sm">Be the first to sell something on ReStyle!</p>
               <Link
-                href="/app/sell"
+                href="/sell"
                 className="inline-flex items-center gap-2 h-11 px-7 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition shadow-sm"
               >
                 Start selling

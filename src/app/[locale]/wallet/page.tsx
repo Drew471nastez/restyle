@@ -1,29 +1,41 @@
+import { getTranslations } from 'next-intl/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Wallet, Clock, TrendingUp } from 'lucide-react';
-import { PayoutForm } from './PayoutForm';
+  Wallet,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Clock,
+  AlertCircle,
+  CreditCard,
+} from 'lucide-react';
+import { MIN_PAYOUT_AMOUNT } from '@/lib/constants';
 
-function getTransactionBadgeVariant(type: string) {
-  switch (type) {
-    case 'sale':
-      return 'default' as const;
-    case 'payout':
-      return 'secondary' as const;
-    case 'refund':
-      return 'destructive' as const;
-    default:
-      return 'outline' as const;
-  }
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  status: string;
+  description: string;
+  created_at: string;
 }
 
+const TX_TYPE_ICONS: Record<string, { icon: typeof ArrowUpRight; color: string }> = {
+  sale: { icon: ArrowDownLeft, color: 'bg-green-100 text-green-600' },
+  payout: { icon: ArrowUpRight, color: 'bg-blue-100 text-blue-600' },
+  refund: { icon: ArrowDownLeft, color: 'bg-red-100 text-red-600' },
+  fee: { icon: ArrowUpRight, color: 'bg-gray-100 text-gray-600' },
+};
+
+const TX_STATUS_STYLES: Record<string, string> = {
+  completed: 'bg-green-100 text-green-700',
+  pending: 'bg-yellow-100 text-yellow-700',
+  failed: 'bg-red-100 text-red-700',
+};
+
 export default async function WalletPage() {
+  const t = await getTranslations('wallet');
   const supabase = await createServerClient();
 
   const {
@@ -31,158 +43,243 @@ export default async function WalletPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect('/login');
     return null;
   }
 
-  // Fetch wallet
-  const { data: wallet } = await supabase
-    .from('wallets')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
+  let availableBalance = 0;
+  let pendingBalance = 0;
+  let totalEarned = 0;
+  let currency = 'RON';
+  let hasIBAN = false;
+  let transactions: Transaction[] = [];
 
-  // Fetch transactions
-  const { data: transactions } = wallet
-    ? await supabase
+  try {
+    const { data: wallet } = await supabase
+      .from('wallets')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (wallet) {
+      availableBalance = wallet.available_balance || 0;
+      pendingBalance = wallet.pending_balance || 0;
+      totalEarned = wallet.total_earned || 0;
+      currency = wallet.currency || 'RON';
+      hasIBAN = !!wallet.iban;
+    }
+  } catch {
+    // silently fail
+  }
+
+  try {
+    const { data: walletData } = await supabase
+      .from('wallets')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (walletData) {
+      const { data: txns } = await supabase
         .from('transactions')
-        .select('*')
-        .eq('wallet_id', wallet.id)
+        .select('id, type, amount, status, description, created_at')
+        .eq('wallet_id', walletData.id)
         .order('created_at', { ascending: false })
-        .limit(50)
-    : { data: [] };
+        .limit(50);
 
-  const available = wallet?.available_balance || 0;
-  const pending = wallet?.pending_balance || 0;
-  const totalEarned = wallet?.total_earned || 0;
-  const currency = wallet?.currency || 'EUR';
+      transactions = txns || [];
+    }
+  } catch {
+    // silently fail
+  }
+
+  const canPayout = availableBalance >= MIN_PAYOUT_AMOUNT && hasIBAN;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Wallet</h1>
-
-      {/* Balance Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-green-600" />
-              </div>
-              <span className="text-sm text-gray-500">Available</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {(available / 100).toFixed(2)} {currency}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-600" />
-              </div>
-              <span className="text-sm text-gray-500">Pending</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {(pending / 100).toFixed(2)} {currency}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-              </div>
-              <span className="text-sm text-gray-500">Total Earned</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {(totalEarned / 100).toFixed(2)} {currency}
-            </p>
-          </CardContent>
-        </Card>
+    <div className="mx-auto max-w-[1440px] px-4 lg:px-8 py-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t('subtitle')}</p>
       </div>
 
-      {/* Payout Request */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg">Request Payout</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PayoutForm
-            availableBalance={available}
-            currency={currency}
-            currentIban={wallet?.iban || ''}
-          />
-        </CardContent>
-      </Card>
+      {/* IBAN Alert */}
+      {!hasIBAN && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-sm font-medium text-amber-800">
+              {t('ibanRequired')}
+            </p>
+            <p className="mt-0.5 text-xs text-amber-600">
+              {t('ibanDescription')}
+            </p>
+            <Link
+              href="/profile"
+              className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-amber-700 hover:text-amber-800"
+            >
+              {t('setupIBAN')}
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Balance Cards */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100">
+              <Wallet className="h-5 w-5 text-violet-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-500">
+              {t('availableBalance')}
+            </p>
+          </div>
+          <p className="mt-3 text-3xl font-bold text-gray-900">
+            {(availableBalance / 100).toFixed(2)}{' '}
+            <span className="text-lg font-medium text-gray-400">
+              {currency}
+            </span>
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100">
+              <Clock className="h-5 w-5 text-amber-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-500">
+              {t('pendingBalance')}
+            </p>
+          </div>
+          <p className="mt-3 text-3xl font-bold text-gray-900">
+            {(pendingBalance / 100).toFixed(2)}{' '}
+            <span className="text-lg font-medium text-gray-400">
+              {currency}
+            </span>
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
+              <CreditCard className="h-5 w-5 text-purple-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-500">
+              {t('totalEarned')}
+            </p>
+          </div>
+          <p className="mt-3 text-3xl font-bold text-gray-900">
+            {(totalEarned / 100).toFixed(2)}{' '}
+            <span className="text-lg font-medium text-gray-400">
+              {currency}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {/* Payout Button */}
+      <div className="mb-8">
+        <form
+          action={async () => {
+            'use server';
+            const { requestPayout } = await import('@/actions/wallet');
+            await requestPayout(availableBalance / 100);
+          }}
+        >
+          <button
+            type="submit"
+            disabled={!canPayout}
+            className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ArrowUpRight className="h-4 w-4" />
+            {t('requestPayout')}
+          </button>
+        </form>
+        {!canPayout && availableBalance > 0 && !hasIBAN && (
+          <p className="mt-2 text-xs text-gray-500">{t('setupIBANFirst')}</p>
+        )}
+        {!canPayout && availableBalance < MIN_PAYOUT_AMOUNT && (
+          <p className="mt-2 text-xs text-gray-500">
+            {t('minPayout', {
+              amount: (MIN_PAYOUT_AMOUNT / 100).toFixed(2),
+              currency,
+            })}
+          </p>
+        )}
+      </div>
 
       {/* Transaction History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Transaction History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!transactions || transactions.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              No transactions yet
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="pb-3 font-medium text-gray-500">Date</th>
-                    <th className="pb-3 font-medium text-gray-500">Type</th>
-                    <th className="pb-3 font-medium text-gray-500">
-                      Description
-                    </th>
-                    <th className="pb-3 font-medium text-gray-500">Status</th>
-                    <th className="pb-3 font-medium text-gray-500 text-right">
-                      Amount
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {transactions.map((tx) => (
-                    <tr key={tx.id}>
-                      <td className="py-3 text-gray-600">
-                        {new Date(tx.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3">
-                        <Badge variant={getTransactionBadgeVariant(tx.type)}>
-                          {tx.type}
-                        </Badge>
-                      </td>
-                      <td className="py-3 text-gray-600">
-                        {tx.description || '-'}
-                      </td>
-                      <td className="py-3">
-                        <Badge variant="outline">{tx.status}</Badge>
-                      </td>
-                      <td
-                        className={`py-3 text-right font-medium ${
-                          tx.type === 'payout' || tx.type === 'refund'
-                            ? 'text-red-600'
-                            : 'text-green-600'
-                        }`}
-                      >
-                        {tx.type === 'payout' || tx.type === 'refund'
-                          ? '-'
-                          : '+'}
-                        {(tx.amount / 100).toFixed(2)} {currency}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div>
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+          {t('transactionHistory')}
+        </h2>
+
+        {transactions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-12 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
+              <CreditCard className="h-7 w-7 text-gray-400" />
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <h3 className="mt-3 text-base font-semibold text-gray-900">
+              {t('noTransactions')}
+            </h3>
+            <p className="mt-1 max-w-xs text-sm text-gray-500">
+              {t('noTransactionsDescription')}
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+            {transactions.map((tx, index) => {
+              const txType = TX_TYPE_ICONS[tx.type] || TX_TYPE_ICONS.fee;
+              const TxIcon = txType.icon;
+              const isPositive = tx.amount > 0;
+
+              return (
+                <div
+                  key={tx.id}
+                  className={`flex items-center gap-3 px-4 py-3.5 ${
+                    index < transactions.length - 1
+                      ? 'border-b border-gray-100'
+                      : ''
+                  }`}
+                >
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${txType.color}`}
+                  >
+                    <TxIcon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900">
+                      {tx.description || t(`txType.${tx.type}`)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(tx.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p
+                      className={`text-sm font-bold ${
+                        isPositive ? 'text-green-600' : 'text-gray-900'
+                      }`}
+                    >
+                      {isPositive ? '+' : ''}
+                      {(tx.amount / 100).toFixed(2)} {currency}
+                    </p>
+                    <span
+                      className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                        TX_STATUS_STYLES[tx.status] ||
+                        'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {t(`txStatus.${tx.status}`)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

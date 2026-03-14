@@ -31,8 +31,8 @@ export function PublicHeader() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Hide on admin and app routes (must be after all hooks)
-  if (pathname.startsWith('/admin') || pathname.startsWith('/app')) return null;
+  // Hide on admin routes (must be after all hooks)
+  if (pathname.startsWith('/admin')) return null;
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,21 +72,21 @@ export function PublicHeader() {
                 {user ? (
                   <>
                     <Link
-                      href="/app/sell"
+                      href="/sell"
                       className="inline-flex items-center gap-2 h-9 px-4 bg-violet-500 text-white rounded-lg text-sm font-semibold hover:bg-violet-600 transition"
                     >
                       <Plus className="h-4 w-4" />
                       Upload
                     </Link>
                     <Link
-                      href="/app/favorites"
+                      href="/favorites"
                       className="relative h-9 w-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
                       title="Favorites"
                     >
                       <Heart className="h-5 w-5" />
                     </Link>
                     <Link
-                      href="/app/messages"
+                      href="/messages"
                       className="relative h-9 w-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
                       title="Messages"
                     >
@@ -122,16 +122,16 @@ export function PublicHeader() {
                           </div>
 
                           <div className="py-1">
-                            <Link href="/app/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <User className="h-4 w-4 text-gray-400" /> Profile
                             </Link>
-                            <Link href="/app/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <Heart className="h-4 w-4 text-gray-400" /> Favorites
                             </Link>
-                            <Link href="/app/orders" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/orders" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <ShoppingBag className="h-4 w-4 text-gray-400" /> My orders
                             </Link>
-                            <Link href="/app/wallet" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <Link href="/wallet" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                               <Wallet className="h-4 w-4 text-gray-400" /> Wallet
                             </Link>
                           </div>
@@ -170,7 +170,7 @@ export function PublicHeader() {
                   <Search className="h-5 w-5" />
                 </button>
                 {user ? (
-                  <Link href="/app/sell" className="h-9 w-9 flex items-center justify-center rounded-lg bg-violet-500 text-white">
+                  <Link href="/sell" className="h-9 w-9 flex items-center justify-center rounded-lg bg-violet-500 text-white">
                     <Plus className="h-5 w-5" />
                   </Link>
                 ) : (
@@ -233,16 +233,16 @@ export function PublicHeader() {
               <div className="my-2 border-t border-gray-100" />
               {user ? (
                 <>
-                  <Link href="/app/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <User className="h-4 w-4 text-gray-400" /> Profile
                   </Link>
-                  <Link href="/app/orders" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/orders" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <ShoppingBag className="h-4 w-4 text-gray-400" /> My orders
                   </Link>
-                  <Link href="/app/messages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/messages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <MessageCircle className="h-4 w-4 text-gray-400" /> Messages
                   </Link>
-                  <Link href="/app/wallet" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <Link href="/wallet" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                     <Wallet className="h-4 w-4 text-gray-400" /> Wallet
                   </Link>
                   <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">

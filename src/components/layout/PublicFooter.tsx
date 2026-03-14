@@ -7,8 +7,8 @@ export function PublicFooter() {
   const t = useTranslations('footer');
   const pathname = usePathname();
 
-  // Hide on app routes
-  if (pathname.startsWith('/app') || pathname.startsWith('/admin')) return null;
+  // Hide on admin routes
+  if (pathname.startsWith('/admin')) return null;
 
   return (
     <footer className="bg-gray-50 border-t border-gray-100">

@@ -7,8 +7,14 @@ import { createServerClient } from '@supabase/ssr';
 const PROTECTED_PATHS = [
   '/checkout',
   '/admin',
-  '/app',
   '/settings',
+  '/profile',
+  '/favorites',
+  '/listings',
+  '/orders',
+  '/messages',
+  '/wallet',
+  '/sell',
 ];
 
 function isProtectedPath(pathname: string): boolean {

@@ -15,7 +15,7 @@ export default async function ConversationPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect('/login');
     return null;
   }
 
