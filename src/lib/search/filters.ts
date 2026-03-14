@@ -49,7 +49,14 @@ export function buildListingsQuery(
     query = query.textSearch('fts', filters.q, { type: 'websearch' });
   }
   if (filters.category) {
-    query = query.eq('category', filters.category);
+    // Category filter may be "women-tops" (category-subcategory) or just "women" (category only)
+    if (filters.category.includes('-')) {
+      const [cat, ...subParts] = filters.category.split('-');
+      const sub = subParts.join('-');
+      query = query.eq('category', cat).eq('subcategory', sub);
+    } else {
+      query = query.eq('category', filters.category);
+    }
   }
   if (filters.size?.length) {
     query = query.in('size', filters.size);
@@ -61,10 +68,10 @@ export function buildListingsQuery(
     query = query.in('brand', filters.brand);
   }
   if (filters.price_min !== undefined) {
-    query = query.gte('price', filters.price_min);
+    query = query.gte('price', filters.price_min * 100);
   }
   if (filters.price_max !== undefined) {
-    query = query.lte('price', filters.price_max);
+    query = query.lte('price', filters.price_max * 100);
   }
   if (filters.country) {
     query = query.eq('country', filters.country);

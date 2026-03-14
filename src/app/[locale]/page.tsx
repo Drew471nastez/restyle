@@ -166,7 +166,7 @@ export default function HomePage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
               <p className="text-gray-500 mb-6 text-sm">Be the first to sell something on ReStyle!</p>
               <Link
-                href="/sell"
+                href="/app/sell"
                 className="inline-flex items-center gap-2 h-11 px-7 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition shadow-sm"
               >
                 Start selling

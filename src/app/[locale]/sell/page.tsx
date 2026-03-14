@@ -20,11 +20,16 @@ export default function SellPage() {
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
-    const newImages: string[] = [];
-    for (let i = 0; i < files.length; i++) {
-      newImages.push(URL.createObjectURL(files[i]));
-    }
-    setImages((prev) => [...prev, ...newImages].slice(0, 5));
+    const remaining = 5 - images.length;
+    const toAdd = Array.from(files).slice(0, remaining);
+    toAdd.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setImages((prev) => [...prev, base64].slice(0, 5));
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   function removeImage(index: number) {

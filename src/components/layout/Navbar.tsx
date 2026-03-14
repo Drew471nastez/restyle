@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
+import { signOut } from '@/actions/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -111,9 +112,13 @@ export function Navbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600 focus:text-red-600">
-                <LogOut className="h-4 w-4" />
-                {t('logout')}
+              <DropdownMenuItem asChild>
+                <form action={signOut} className="w-full">
+                  <button type="submit" className="flex items-center gap-2 w-full text-red-600 focus:text-red-600">
+                    <LogOut className="h-4 w-4" />
+                    {t('logout')}
+                  </button>
+                </form>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -158,9 +163,13 @@ export function Navbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600 focus:text-red-600">
-                <LogOut className="h-4 w-4" />
-                {t('logout')}
+              <DropdownMenuItem asChild>
+                <form action={signOut} className="w-full">
+                  <button type="submit" className="flex items-center gap-2 w-full text-red-600 focus:text-red-600">
+                    <LogOut className="h-4 w-4" />
+                    {t('logout')}
+                  </button>
+                </form>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

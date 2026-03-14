@@ -7,10 +7,8 @@ import { createServerClient } from '@supabase/ssr';
 const PROTECTED_PATHS = [
   '/checkout',
   '/admin',
-  '/sell',
+  '/app',
   '/settings',
-  '/wallet',
-  '/favorites',
 ];
 
 function isProtectedPath(pathname: string): boolean {
@@ -31,7 +29,9 @@ export default async function middleware(request: NextRequest) {
 
   // Check auth for protected routes
   if (isProtectedPath(pathname)) {
-    const response = NextResponse.next();
+    // We need a temporary response to collect auth cookie updates
+    const tempResponse = NextResponse.next();
+    const cookiesToForward: Array<{ name: string; value: string; options: Record<string, unknown> }> = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -43,7 +43,11 @@ export default async function middleware(request: NextRequest) {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
+              // Store cookies to forward to the final response
+              cookiesToForward.push({ name, value, options });
+              // Also set on request so intlMiddleware sees updated cookies
+              request.cookies.set(name, value);
+              tempResponse.cookies.set(name, value, options);
             });
           },
         },
@@ -59,6 +63,13 @@ export default async function middleware(request: NextRequest) {
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    // User is authenticated - run intlMiddleware and forward auth cookies
+    const intlResponse = intlMiddleware(request);
+    cookiesToForward.forEach(({ name, value, options }) => {
+      intlResponse.cookies.set(name, value, options);
+    });
+    return intlResponse;
   }
 
   return intlMiddleware(request);

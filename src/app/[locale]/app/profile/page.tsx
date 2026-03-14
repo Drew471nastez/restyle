@@ -308,7 +308,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Sell CTA */}
-        <Link href="/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition mb-6">
+        <Link href="/app/sell" className="flex items-center justify-center gap-2 w-full h-11 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition mb-6">
           <Plus className="h-4 w-4" />
           {t('listAnItem')}
         </Link>
@@ -367,7 +367,7 @@ export default function ProfilePage() {
                     <Package className="h-12 w-12 text-gray-200 mx-auto mb-4" />
                     <p className="text-gray-900 font-medium mb-1">{t('startSellingCTA')}</p>
                     <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">{t('startSellingDescription')}</p>
-                    <Link href="/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition">
+                    <Link href="/app/sell" className="inline-flex items-center gap-2 px-6 py-2.5 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition">
                       <Plus className="h-4 w-4" />
                       {t('listAnItem')}
                     </Link>
