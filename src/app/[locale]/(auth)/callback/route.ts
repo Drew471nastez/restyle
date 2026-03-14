@@ -11,16 +11,24 @@ export async function GET(request: NextRequest) {
     const { error, data } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Check if user has a profile set up
+      // Check if user has completed onboarding
       const { data: profile } = await supabase
         .from('profiles')
-        .select('username')
+        .select('onboarding_step, status')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
 
-      // If no profile or username starts with default prefix, redirect to onboarding
-      if (!profile || !profile.username || profile.username.startsWith('user_')) {
+      // New user or incomplete onboarding → redirect to onboarding
+      if (!profile || profile.onboarding_step !== 'complete') {
         return NextResponse.redirect(`${origin}/onboarding`);
+      }
+
+      // Reactivate if returning from deactivation
+      if (profile.status === 'deactivated') {
+        await supabase
+          .from('profiles')
+          .update({ status: 'active' })
+          .eq('id', data.user.id);
       }
 
       return NextResponse.redirect(`${origin}${next}`);

@@ -15,12 +15,19 @@ const PROTECTED_PATHS = [
   '/messages',
   '/wallet',
   '/sell',
+  '/onboarding',
 ];
 
 function isProtectedPath(pathname: string): boolean {
   // Strip locale prefix if present
   const pathWithoutLocale = pathname.replace(/^\/(en|ro)/, '') || '/';
   return PROTECTED_PATHS.some(p => pathWithoutLocale.startsWith(p));
+}
+
+// Public profile paths like /profile/username should NOT be protected
+function isPublicProfilePath(pathname: string): boolean {
+  const pathWithoutLocale = pathname.replace(/^\/(en|ro)/, '') || '/';
+  return /^\/profile\/[^/]+/.test(pathWithoutLocale);
 }
 
 const intlMiddleware = createMiddleware(routing);
@@ -33,9 +40,13 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Public profile pages are not protected
+  if (isPublicProfilePath(pathname)) {
+    return intlMiddleware(request);
+  }
+
   // Check auth for protected routes
   if (isProtectedPath(pathname)) {
-    // We need a temporary response to collect auth cookie updates
     const tempResponse = NextResponse.next();
     const cookiesToForward: Array<{ name: string; value: string; options: Record<string, unknown> }> = [];
 
@@ -49,9 +60,7 @@ export default async function middleware(request: NextRequest) {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) => {
-              // Store cookies to forward to the final response
               cookiesToForward.push({ name, value, options });
-              // Also set on request so intlMiddleware sees updated cookies
               request.cookies.set(name, value);
               tempResponse.cookies.set(name, value, options);
             });

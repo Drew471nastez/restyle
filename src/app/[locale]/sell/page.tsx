@@ -6,6 +6,7 @@ import { useRouter } from '@/i18n/navigation';
 import { createListing } from '@/actions/listings';
 import { CATEGORIES, CONDITIONS, SIZES, MAX_IMAGES_PER_LISTING } from '@/lib/constants';
 import { ImagePlus, X, Loader2 } from 'lucide-react';
+import { SellerGate } from '@/components/user/SellerGate';
 
 export default function SellPage() {
   const t = useTranslations('sell');
@@ -80,6 +81,7 @@ export default function SellPage() {
   };
 
   return (
+    <SellerGate>
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-2xl px-4 py-8">
         <div className="mb-6">
@@ -347,5 +349,6 @@ export default function SellPage() {
         </form>
       </div>
     </div>
+    </SellerGate>
   );
 }

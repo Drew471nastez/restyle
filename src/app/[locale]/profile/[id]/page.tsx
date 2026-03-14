@@ -9,33 +9,51 @@ interface ProfilePageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
+export default async function PublicProfilePage({ params }: ProfilePageProps) {
   const { id } = await params;
   const t = await getTranslations('profile');
   const supabase = await createServerClient();
 
-  // Try by UUID first, then by username
+  // Resolve profile by UUID or username
   let profile = null;
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
   if (isUUID) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data } = await supabase.from('profiles').select('*').eq('id', id).single();
     profile = data;
   } else {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('username', id)
-      .single();
+    const { data } = await supabase.from('profiles').select('*').eq('username', id.toLowerCase()).single();
     profile = data;
   }
 
-  if (!profile) {
-    notFound();
+  // Handle missing, deleted, suspended, banned
+  if (!profile) notFound();
+  if (profile.status === 'deleted') notFound();
+  if (profile.status === 'banned') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">🚫</span>
+          </div>
+          <h1 className="text-lg font-bold text-gray-900 mb-2">Account unavailable</h1>
+          <p className="text-sm text-gray-500">This account has been suspended for violating our community guidelines.</p>
+        </div>
+      </div>
+    );
+  }
+  if (profile.status === 'deactivated') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">💤</span>
+          </div>
+          <h1 className="text-lg font-bold text-gray-900 mb-2">Account deactivated</h1>
+          <p className="text-sm text-gray-500">This user has temporarily deactivated their account.</p>
+        </div>
+      </div>
+    );
   }
 
   // Fetch active listings
@@ -65,6 +83,25 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .select('*', { count: 'exact', head: true })
     .eq('follower_id', profile.id);
 
+  // Check if current user follows this profile
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  let isFollowing = false;
+  let isOwnProfile = false;
+  if (currentUser) {
+    isOwnProfile = currentUser.id === profile.id;
+    if (!isOwnProfile) {
+      const { data: followData } = await supabase
+        .from('follows')
+        .select('follower_id')
+        .eq('follower_id', currentUser.id)
+        .eq('following_id', profile.id)
+        .maybeSingle();
+      isFollowing = !!followData;
+    }
+  }
+
+  const joinDate = new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-5xl px-4 py-8">
@@ -73,11 +110,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start">
             <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full bg-gray-200 border-2 border-gray-100">
               {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.username}
-                  className="h-full w-full object-cover"
-                />
+                <img src={profile.avatar_url} alt={profile.username} className="h-full w-full object-cover" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-gray-400 bg-violet-50">
                   {profile.username?.charAt(0).toUpperCase()}
@@ -88,26 +121,21 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                 <h1 className="text-2xl font-bold text-gray-900">{profile.display_name || profile.username}</h1>
-                {profile.is_verified && (
-                  <Badge variant="default">{t('verified')}</Badge>
-                )}
-                {profile.is_pro && (
-                  <Badge variant="outline">PRO</Badge>
-                )}
+                {profile.is_verified && <Badge variant="default">{t('verified')}</Badge>}
+                {profile.is_pro && <Badge variant="outline">PRO</Badge>}
+                {profile.holiday_mode && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">On holiday</Badge>}
               </div>
 
               <p className="text-sm text-gray-500 mt-0.5">@{profile.username}</p>
 
-              {profile.bio && (
-                <p className="mt-3 text-sm text-gray-600">{profile.bio}</p>
-              )}
+              {profile.bio && <p className="mt-3 text-sm text-gray-600">{profile.bio}</p>}
 
               <div className="mt-3 flex items-center justify-center gap-6 sm:justify-start">
-                {profile.rating_avg !== null && (
+                {profile.rating_count > 0 && (
                   <div className="flex items-center gap-1 text-sm">
                     <span className="text-yellow-500">&#9733;</span>
                     <span className="font-medium">{Number(profile.rating_avg).toFixed(1)}</span>
-                    <span className="text-gray-500">({profile.rating_count} {t('reviews')})</span>
+                    <span className="text-gray-500">({profile.rating_count})</span>
                   </div>
                 )}
                 <div className="text-sm">
@@ -118,11 +146,46 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <span className="font-medium">{followingCount || 0}</span>{' '}
                   <span className="text-gray-500">{t('following')}</span>
                 </div>
+                {(profile.listings_count ?? 0) > 0 && (
+                  <div className="text-sm">
+                    <span className="font-medium">{profile.listings_count}</span>{' '}
+                    <span className="text-gray-500">{t('listings')}</span>
+                  </div>
+                )}
               </div>
 
-              <p className="mt-2 text-xs text-gray-400">
-                {t('memberSince', { date: new Date(profile.created_at).toLocaleDateString() })}
-              </p>
+              <div className="mt-3 flex items-center justify-center gap-3 sm:justify-start">
+                {profile.city && profile.country && (
+                  <span className="text-xs text-gray-400">{profile.city}, {profile.country}</span>
+                )}
+                <span className="text-xs text-gray-400">Joined {joinDate}</span>
+                {profile.response_rate > 0 && (
+                  <span className="text-xs text-gray-400">Responds within {profile.response_time_hours || '?'}h</span>
+                )}
+              </div>
+
+              {/* Actions */}
+              {!isOwnProfile && currentUser && (
+                <div className="mt-4 flex items-center justify-center gap-2 sm:justify-start">
+                  <form action={async () => { 'use server'; /* follow/unfollow handled client-side */ }}>
+                    <button type="button" className={`h-9 px-5 rounded-lg text-sm font-semibold transition ${
+                      isFollowing
+                        ? 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                        : 'bg-violet-500 text-white hover:bg-violet-600'
+                    }`}>
+                      {isFollowing ? t('unfollow') : t('follow')}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {isOwnProfile && (
+                <div className="mt-4 flex items-center justify-center gap-2 sm:justify-start">
+                  <Link href="/settings" className="h-9 px-5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition flex items-center">
+                    {t('editProfile')}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -132,38 +195,25 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
             {t('listings')} ({listings?.length || 0})
           </h2>
-
           {listings && listings.length > 0 ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {listings.map((listing) => (
-                <Link
-                  key={listing.id}
-                  href={`/item/${listing.id}`}
-                  className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md"
-                >
+                <Link key={listing.id} href={`/item/${listing.id}`} className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
                   <div className="aspect-[3/4] w-full overflow-hidden bg-gray-100">
-                    {listing.images?.[0] && (
-                      <img
-                        src={listing.images[0]}
-                        alt={listing.title}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    )}
+                    {listing.images?.[0] && <img src={listing.images[0]} alt={listing.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />}
                   </div>
                   <div className="p-3">
-                    <p className="truncate text-sm font-medium text-gray-900">
-                      {listing.title}
-                    </p>
+                    <p className="truncate text-sm font-medium text-gray-900">{listing.title}</p>
                     <p className="text-xs text-gray-500">{listing.size}</p>
-                    <p className="mt-1 text-sm font-bold text-violet-700">
-                      {(listing.price / 100).toFixed(2)} RON
-                    </p>
+                    <p className="mt-1 text-sm font-bold text-violet-700">{(listing.price / 100).toFixed(2)} {listing.currency || 'RON'}</p>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">{t('noListings')}</p>
+            <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+              <p className="text-sm text-gray-500">{t('noListings')}</p>
+            </div>
           )}
         </section>
 
@@ -172,7 +222,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
             {t('reviewsTitle')} ({profile.rating_count || 0})
           </h2>
-
           {reviews && reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (
@@ -181,11 +230,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     <div className="flex items-start gap-3">
                       <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200">
                         {review.reviewer?.avatar_url ? (
-                          <img
-                            src={review.reviewer.avatar_url}
-                            alt={review.reviewer.username}
-                            className="h-full w-full object-cover"
-                          />
+                          <img src={review.reviewer.avatar_url} alt={review.reviewer.username} className="h-full w-full object-cover" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-400">
                             {review.reviewer?.username?.charAt(0).toUpperCase()}
@@ -194,23 +239,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {review.reviewer?.username}
-                          </span>
-                          <div className="flex items-center text-yellow-500">
+                          <span className="text-sm font-medium text-gray-900">{review.reviewer?.username}</span>
+                          <div className="flex items-center">
                             {Array.from({ length: 5 }, (_, i) => (
-                              <span key={i} className={i < review.rating ? 'text-yellow-500' : 'text-gray-300'}>
-                                &#9733;
-                              </span>
+                              <span key={i} className={`text-sm ${i < review.rating ? 'text-yellow-500' : 'text-gray-300'}`}>&#9733;</span>
                             ))}
                           </div>
                         </div>
-                        {review.comment && (
-                          <p className="mt-1 text-sm text-gray-600">{review.comment}</p>
-                        )}
-                        <p className="mt-1 text-xs text-gray-400">
-                          {new Date(review.created_at).toLocaleDateString()}
-                        </p>
+                        {review.comment && <p className="mt-1 text-sm text-gray-600">{review.comment}</p>}
+                        <p className="mt-1 text-xs text-gray-400">{new Date(review.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -218,7 +255,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">{t('noReviews')}</p>
+            <div className="text-center py-8 bg-white rounded-xl border border-gray-200">
+              <p className="text-sm text-gray-500">{t('noReviews')}</p>
+            </div>
           )}
         </section>
       </div>

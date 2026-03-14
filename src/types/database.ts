@@ -6,6 +6,12 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+// ── Enums ──────────────────────────────────────────────────────────
+export type UserStatus = 'onboarding' | 'active' | 'suspended' | 'banned' | 'deactivated' | 'deleted';
+export type SellerStatus = 'not_ready' | 'pending_verification' | 'ready' | 'blocked';
+export type OnboardingStep = 'profile' | 'location' | 'preferences' | 'complete';
+
+// ── Tables ─────────────────────────────────────────────────────────
 export interface Database {
   public: {
     Tables: {
@@ -22,10 +28,23 @@ export interface Database {
           is_verified: boolean;
           is_pro: boolean;
           is_admin: boolean;
+          status: UserStatus;
+          seller_status: SellerStatus;
+          onboarding_step: OnboardingStep;
+          onboarding_completed_at: string | null;
           stripe_account_id: string | null;
           stripe_onboarding_complete: boolean;
           rating_avg: number;
           rating_count: number;
+          listings_count: number;
+          sold_count: number;
+          response_rate: number;
+          response_time_hours: number | null;
+          last_active_at: string | null;
+          holiday_mode: boolean;
+          accepted_seller_terms_at: string | null;
+          accepted_buyer_terms_at: string | null;
+          username_changed_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,15 +60,25 @@ export interface Database {
           is_verified?: boolean;
           is_pro?: boolean;
           is_admin?: boolean;
+          status?: UserStatus;
+          seller_status?: SellerStatus;
+          onboarding_step?: OnboardingStep;
+          onboarding_completed_at?: string | null;
           stripe_account_id?: string | null;
           stripe_onboarding_complete?: boolean;
           rating_avg?: number;
           rating_count?: number;
-          created_at?: string;
-          updated_at?: string;
+          listings_count?: number;
+          sold_count?: number;
+          response_rate?: number;
+          response_time_hours?: number | null;
+          last_active_at?: string | null;
+          holiday_mode?: boolean;
+          accepted_seller_terms_at?: string | null;
+          accepted_buyer_terms_at?: string | null;
+          username_changed_at?: string | null;
         };
         Update: {
-          id?: string;
           username?: string;
           display_name?: string | null;
           avatar_url?: string | null;
@@ -60,12 +89,250 @@ export interface Database {
           is_verified?: boolean;
           is_pro?: boolean;
           is_admin?: boolean;
+          status?: UserStatus;
+          seller_status?: SellerStatus;
+          onboarding_step?: OnboardingStep;
+          onboarding_completed_at?: string | null;
           stripe_account_id?: string | null;
           stripe_onboarding_complete?: boolean;
           rating_avg?: number;
           rating_count?: number;
+          listings_count?: number;
+          sold_count?: number;
+          response_rate?: number;
+          response_time_hours?: number | null;
+          last_active_at?: string | null;
+          holiday_mode?: boolean;
+          accepted_seller_terms_at?: string | null;
+          accepted_buyer_terms_at?: string | null;
+          username_changed_at?: string | null;
           updated_at?: string;
         };
+      };
+      user_private_details: {
+        Row: {
+          user_id: string;
+          legal_first_name: string | null;
+          legal_last_name: string | null;
+          date_of_birth: string | null;
+          tax_id: string | null;
+          id_verification_status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          legal_first_name?: string | null;
+          legal_last_name?: string | null;
+          date_of_birth?: string | null;
+          tax_id?: string | null;
+          id_verification_status?: string;
+        };
+        Update: {
+          legal_first_name?: string | null;
+          legal_last_name?: string | null;
+          date_of_birth?: string | null;
+          tax_id?: string | null;
+          id_verification_status?: string;
+          updated_at?: string;
+        };
+      };
+      shipping_addresses: {
+        Row: {
+          id: string;
+          user_id: string;
+          label: string;
+          full_name: string;
+          street_line_1: string;
+          street_line_2: string | null;
+          city: string;
+          state_province: string | null;
+          postal_code: string;
+          country: string;
+          phone: string | null;
+          is_default: boolean;
+          is_return_address: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          label?: string;
+          full_name: string;
+          street_line_1: string;
+          street_line_2?: string | null;
+          city: string;
+          state_province?: string | null;
+          postal_code: string;
+          country: string;
+          phone?: string | null;
+          is_default?: boolean;
+          is_return_address?: boolean;
+        };
+        Update: {
+          label?: string;
+          full_name?: string;
+          street_line_1?: string;
+          street_line_2?: string | null;
+          city?: string;
+          state_province?: string | null;
+          postal_code?: string;
+          country?: string;
+          phone?: string | null;
+          is_default?: boolean;
+          is_return_address?: boolean;
+          updated_at?: string;
+        };
+      };
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          email_messages: boolean;
+          email_orders: boolean;
+          email_offers: boolean;
+          email_price_drops: boolean;
+          email_marketing: boolean;
+          email_security: boolean;
+          push_messages: boolean;
+          push_orders: boolean;
+          push_offers: boolean;
+          push_marketing: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          email_messages?: boolean;
+          email_orders?: boolean;
+          email_offers?: boolean;
+          email_price_drops?: boolean;
+          email_marketing?: boolean;
+          email_security?: boolean;
+          push_messages?: boolean;
+          push_orders?: boolean;
+          push_offers?: boolean;
+          push_marketing?: boolean;
+        };
+        Update: {
+          email_messages?: boolean;
+          email_orders?: boolean;
+          email_offers?: boolean;
+          email_price_drops?: boolean;
+          email_marketing?: boolean;
+          email_security?: boolean;
+          push_messages?: boolean;
+          push_orders?: boolean;
+          push_offers?: boolean;
+          push_marketing?: boolean;
+          updated_at?: string;
+        };
+      };
+      privacy_settings: {
+        Row: {
+          user_id: string;
+          show_city: boolean;
+          show_online_status: boolean;
+          show_last_active: boolean;
+          allow_search_engines: boolean;
+          allow_messages_from: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          show_city?: boolean;
+          show_online_status?: boolean;
+          show_last_active?: boolean;
+          allow_search_engines?: boolean;
+          allow_messages_from?: string;
+        };
+        Update: {
+          show_city?: boolean;
+          show_online_status?: boolean;
+          show_last_active?: boolean;
+          allow_search_engines?: boolean;
+          allow_messages_from?: string;
+          updated_at?: string;
+        };
+      };
+      seller_preferences: {
+        Row: {
+          user_id: string;
+          bundle_discount_enabled: boolean;
+          bundle_discount_percent: number;
+          bundle_min_items: number;
+          auto_accept_full_price: boolean;
+          shipping_turnaround_days: number;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          bundle_discount_enabled?: boolean;
+          bundle_discount_percent?: number;
+          bundle_min_items?: number;
+          auto_accept_full_price?: boolean;
+          shipping_turnaround_days?: number;
+        };
+        Update: {
+          bundle_discount_enabled?: boolean;
+          bundle_discount_percent?: number;
+          bundle_min_items?: number;
+          auto_accept_full_price?: boolean;
+          shipping_turnaround_days?: number;
+          updated_at?: string;
+        };
+      };
+      blocked_users: {
+        Row: {
+          blocker_id: string;
+          blocked_id: string;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          blocker_id: string;
+          blocked_id: string;
+          reason?: string | null;
+        };
+        Update: never;
+      };
+      user_reports: {
+        Row: {
+          id: string;
+          reporter_id: string;
+          reported_id: string;
+          reason: string;
+          description: string | null;
+          status: string;
+          admin_notes: string | null;
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          reporter_id: string;
+          reported_id: string;
+          reason: string;
+          description?: string | null;
+          status?: string;
+          admin_notes?: string | null;
+        };
+        Update: {
+          status?: string;
+          admin_notes?: string | null;
+          resolved_at?: string | null;
+        };
+      };
+      reserved_usernames: {
+        Row: {
+          username: string;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          username: string;
+          reason?: string | null;
+        };
+        Update: never;
       };
       listings: {
         Row: {
@@ -111,8 +378,6 @@ export interface Database {
           country?: string;
           views_count?: number;
           favorites_count?: number;
-          created_at?: string;
-          updated_at?: string;
         };
         Update: {
           seller_id?: string;
@@ -156,6 +421,7 @@ export interface Database {
           delivered_at: string | null;
           completed_at: string | null;
           dispute_reason: string | null;
+          shipping_address_snapshot: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -178,6 +444,7 @@ export interface Database {
           delivered_at?: string | null;
           completed_at?: string | null;
           dispute_reason?: string | null;
+          shipping_address_snapshot?: Json | null;
         };
         Update: {
           status?: string;
@@ -399,7 +666,15 @@ export interface Database {
   };
 }
 
+// ── Convenience types ──────────────────────────────────────────────
 export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
+export type UserPrivateDetails = Database['public']['Tables']['user_private_details']['Row'];
+export type ShippingAddress = Database['public']['Tables']['shipping_addresses']['Row'];
+export type NotificationPreferences = Database['public']['Tables']['notification_preferences']['Row'];
+export type PrivacySettings = Database['public']['Tables']['privacy_settings']['Row'];
+export type SellerPreferences = Database['public']['Tables']['seller_preferences']['Row'];
 export type Listing = Database['public']['Tables']['listings']['Row'];
 export type Order = Database['public']['Tables']['orders']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
@@ -408,3 +683,16 @@ export type Review = Database['public']['Tables']['reviews']['Row'];
 export type Wallet = Database['public']['Tables']['wallets']['Row'];
 export type Transaction = Database['public']['Tables']['transactions']['Row'];
 export type Subscription = Database['public']['Tables']['subscriptions']['Row'];
+export type BlockedUser = Database['public']['Tables']['blocked_users']['Row'];
+export type UserReport = Database['public']['Tables']['user_reports']['Row'];
+
+// ── Seller eligibility ─────────────────────────────────────────────
+export interface SellerEligibility {
+  canSell: boolean;
+  missing: string[];
+}
+
+export interface BuyerEligibility {
+  canBuy: boolean;
+  missing: string[];
+}
