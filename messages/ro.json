@@ -492,6 +492,27 @@
     "yourRightsTitle": "Drepturile tale",
     "contactTitle": "Contacteaz\u0103-ne"
   },
+  "onboarding": {
+    "welcomeTitle": "Configureaz\u0103-\u021bi profilul",
+    "welcomeSubtitle": "Alege un nume de utilizator \u0219i adaug\u0103 o fotografie ca s\u0103 te g\u0103seasc\u0103 lumea pe ReStyle.",
+    "username": "Nume utilizator",
+    "usernameHint": "Doar litere, cifre \u0219i underscore. Minim 3 caractere.",
+    "displayName": "Nume afi\u0219at",
+    "displayNamePlaceholder": "Numele t\u0103u",
+    "continue": "Continu\u0103",
+    "bioTitle": "Spune-ne despre tine",
+    "bioSubtitle": "Adaug\u0103 o scurt\u0103 descriere. Po\u021bi schimba oricând mai târziu.",
+    "bio": "Descriere",
+    "bioPlaceholder": "Ador moda vintage \u0219i stilul sustenabil...",
+    "back": "\u00cenapoi",
+    "finish": "Finalizeaz\u0103",
+    "saving": "Se salveaz\u0103...",
+    "skip": "Sari peste",
+    "usernameTooShort": "Numele de utilizator trebuie s\u0103 aib\u0103 cel pu\u021bin 3 caractere.",
+    "usernameInvalid": "Numele de utilizator poate con\u021bine doar litere, cifre \u0219i underscore.",
+    "usernameTaken": "Acest nume de utilizator este deja luat. Alege altul.",
+    "unexpectedError": "Ceva nu a func\u021bionat. \u00cencearc\u0103 din nou."
+  },
   "countrySelector": {
     "title": "Unde locuie\u0219ti?",
     "subtitle": "Selecteaz\u0103 \u021bara ta pentru a vedea articole relevante",

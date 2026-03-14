@@ -49,8 +49,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   // Fetch reviews
   const { data: reviews } = await supabase
     .from('reviews')
-    .select('*, profiles!reviewer_id(username, avatar_url)')
-    .eq('reviewee_id', profile.id)
+    .select('*, reviewer:profiles!reviewer_id(username, avatar_url)')
+    .eq('reviewed_id', profile.id)
     .order('created_at', { ascending: false })
     .limit(10);
 
@@ -180,22 +180,22 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200">
-                        {review.profiles?.avatar_url ? (
+                        {review.reviewer?.avatar_url ? (
                           <img
-                            src={review.profiles.avatar_url}
-                            alt={review.profiles.username}
+                            src={review.reviewer.avatar_url}
+                            alt={review.reviewer.username}
                             className="h-full w-full object-cover"
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-400">
-                            {review.profiles?.username?.charAt(0).toUpperCase()}
+                            {review.reviewer?.username?.charAt(0).toUpperCase()}
                           </div>
                         )}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-gray-900">
-                            {review.profiles?.username}
+                            {review.reviewer?.username}
                           </span>
                           <div className="flex items-center text-yellow-500">
                             {Array.from({ length: 5 }, (_, i) => (

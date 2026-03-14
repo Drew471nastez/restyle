@@ -8,7 +8,23 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createServerClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error && data.user) {
+      // Check if user has a profile set up
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', data.user.id)
+        .single();
+
+      // If no profile or username starts with default prefix, redirect to onboarding
+      if (!profile || !profile.username || profile.username.startsWith('user_')) {
+        return NextResponse.redirect(`${origin}/onboarding`);
+      }
+
+      return NextResponse.redirect(`${origin}${next}`);
+    }
 
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);

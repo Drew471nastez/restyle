@@ -492,6 +492,27 @@
     "yourRightsTitle": "Your Rights",
     "contactTitle": "Contact Us"
   },
+  "onboarding": {
+    "welcomeTitle": "Set up your profile",
+    "welcomeSubtitle": "Choose a username and add a photo so people can find you on ReStyle.",
+    "username": "Username",
+    "usernameHint": "Letters, numbers, and underscores only. Min 3 characters.",
+    "displayName": "Display name",
+    "displayNamePlaceholder": "Your name",
+    "continue": "Continue",
+    "bioTitle": "Tell us about yourself",
+    "bioSubtitle": "Add a short bio so buyers and sellers know who you are. You can always change this later.",
+    "bio": "Bio",
+    "bioPlaceholder": "I love vintage fashion and sustainable style...",
+    "back": "Back",
+    "finish": "Complete setup",
+    "saving": "Saving...",
+    "skip": "Skip for now",
+    "usernameTooShort": "Username must be at least 3 characters.",
+    "usernameInvalid": "Username can only contain letters, numbers, and underscores.",
+    "usernameTaken": "This username is already taken. Please choose another.",
+    "unexpectedError": "Something went wrong. Please try again."
+  },
   "countrySelector": {
     "title": "Where do you live?",
     "subtitle": "Select your country to see relevant items near you",

@@ -18,7 +18,7 @@ const ORDER_STATUS_STYLES: Record<string, string> = {
 interface Order {
   id: string;
   status: string;
-  total_price: number;
+  total_amount: number;
   created_at: string;
   listing: {
     id: string;
@@ -52,7 +52,7 @@ export default async function OrdersPage({
   try {
     const { data: buying } = await supabase
       .from('orders')
-      .select('id, status, total_price, created_at, listing:listings(id, title, images)')
+      .select('id, status, total_amount, created_at, listing:listings(id, title, images)')
       .eq('buyer_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -64,7 +64,7 @@ export default async function OrdersPage({
   try {
     const { data: selling } = await supabase
       .from('orders')
-      .select('id, status, total_price, created_at, listing:listings(id, title, images)')
+      .select('id, status, total_amount, created_at, listing:listings(id, title, images)')
       .eq('seller_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -164,7 +164,7 @@ export default async function OrdersPage({
                   {order.listing?.title || t('unknownItem')}
                 </h3>
                 <p className="mt-0.5 text-sm font-bold text-violet-600">
-                  {(order.total_price / 100).toFixed(2)} RON
+                  {(order.total_amount / 100).toFixed(2)} RON
                 </p>
                 <p className="mt-0.5 text-xs text-gray-400">
                   {new Date(order.created_at).toLocaleDateString()}

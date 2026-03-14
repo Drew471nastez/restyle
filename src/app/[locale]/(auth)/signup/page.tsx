@@ -49,7 +49,7 @@ export default function SignupPage() {
         password,
         options: {
           data: { username },
-          emailRedirectTo: `${window.location.origin}/callback?next=/`,
+          emailRedirectTo: `${window.location.origin}/callback?next=/onboarding`,
         },
       });
 

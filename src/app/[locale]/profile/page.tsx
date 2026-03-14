@@ -73,11 +73,30 @@ export default function ProfilePage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || cancelled) return;
 
-        const { data } = await supabase
+        // Try to get existing profile
+        let { data } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
+
+        // If profile doesn't exist, create it
+        if (!data && !cancelled) {
+          const username = user.user_metadata?.username
+            || user.email?.split('@')[0]
+            || `user_${user.id.slice(0, 8)}`;
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              username,
+              display_name: user.user_metadata?.full_name || user.user_metadata?.name || username,
+              avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+            }, { onConflict: 'id' })
+            .select('*')
+            .single();
+          data = newProfile;
+        }
 
         if (cancelled) return;
 
@@ -87,35 +106,44 @@ export default function ProfilePage() {
           setEditBio(data.bio || '');
         }
 
-        const { data: listingsData } = await supabase
-          .from('listings')
-          .select('id, title, price, currency, images, status, views_count, favorites_count')
-          .eq('seller_id', user.id)
-          .order('created_at', { ascending: false });
-        if (!cancelled && listingsData) setListings(listingsData);
+        // Load listings (silently handle errors for each query)
+        try {
+          const { data: listingsData } = await supabase
+            .from('listings')
+            .select('id, title, price, currency, images, status, views_count, favorites_count')
+            .eq('seller_id', user.id)
+            .order('created_at', { ascending: false });
+          if (!cancelled && listingsData) setListings(listingsData);
+        } catch { /* table may not exist yet */ }
 
-        const { data: favsData } = await supabase
-          .from('favorites')
-          .select('listing_id, listings(id, title, price, currency, images, status, views_count, favorites_count)')
-          .eq('user_id', user.id);
-        if (!cancelled && favsData) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setFavorites(favsData.map((f: any) => f.listings).filter(Boolean));
-        }
+        try {
+          const { data: favsData } = await supabase
+            .from('favorites')
+            .select('listing_id, listings(id, title, price, currency, images, status, views_count, favorites_count)')
+            .eq('user_id', user.id);
+          if (!cancelled && favsData) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setFavorites(favsData.map((f: any) => f.listings).filter(Boolean));
+          }
+        } catch { /* table may not exist yet */ }
 
-        const { count: followers } = await supabase
-          .from('follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('following_id', user.id);
-        if (!cancelled) setFollowerCount(followers || 0);
+        try {
+          const { count: followers } = await supabase
+            .from('follows')
+            .select('*', { count: 'exact', head: true })
+            .eq('following_id', user.id);
+          if (!cancelled) setFollowerCount(followers || 0);
+        } catch { /* table may not exist yet */ }
 
-        const { count: following } = await supabase
-          .from('follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('follower_id', user.id);
-        if (!cancelled) setFollowingCount(following || 0);
+        try {
+          const { count: following } = await supabase
+            .from('follows')
+            .select('*', { count: 'exact', head: true })
+            .eq('follower_id', user.id);
+          if (!cancelled) setFollowingCount(following || 0);
+        } catch { /* table may not exist yet */ }
       } catch {
-        // silently fail
+        // auth error
       } finally {
         if (!cancelled) setIsLoading(false);
       }
